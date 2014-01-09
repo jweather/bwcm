@@ -323,6 +323,7 @@ $('#playerSave').click(function() { playerSave(); });
 function playerSave() {
 	$.post('/api/players/update', JSON.stringify(editPlayer), function(r) {
 		editPlayer = r.result;
+		$('#slideTable').html('<img src="ajax-loading.gif">');
 		setTimeout(refreshPlayer, 1000); // update slide list to show new thumbnail URL
 		playerDirty = false;
 		$('#playerSave').hide();
