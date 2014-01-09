@@ -68,6 +68,7 @@ namespace BWCMAPI.data {
             File.WriteAllBytes(localFile, data);
 
             mediaID = Scala.uploadMedia(localFile, "/Widgets", fname);
+            try { File.Delete(localFile); } catch { }
             return mediaID;
         }
 

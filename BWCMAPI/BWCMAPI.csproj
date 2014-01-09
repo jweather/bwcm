@@ -38,10 +38,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="ScalaWS, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ScalaWS\bin\Debug\ScalaWS.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core">
@@ -125,6 +121,13 @@
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="js\jquery.map" />
     <None Include="log4net.xsd" />
+    <None Include="Web.config.prototype" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Experiments\Scala\ScalaWS\ScalaWS.csproj">
+      <Project>{A189B032-3A7B-42BE-81D1-455239F51E83}</Project>
+      <Name>ScalaWS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

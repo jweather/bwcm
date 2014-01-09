@@ -6,7 +6,9 @@ function refreshPlayerTable() {
 	$('#playerTable').html('<img src="ajax-loader.gif">');
 	$.get('/api/players', function(r) {
 		players = r.result;
-		players = players.sort(function(a,b) { if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; });
+		players = players.sort(function(a,b) {
+			if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; 
+		});
 		$('#playerTable').html('');
 		$('#playerTable').json2html(players, playerRow);
 	});
@@ -325,7 +327,6 @@ function playerSave() {
 		playerDirty = false;
 		$('#playerSave').hide();
 	}).fail(function(r) {
-		alert('fail');
 		console.log(r);
 	});
 }
