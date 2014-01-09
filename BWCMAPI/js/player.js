@@ -335,7 +335,7 @@ function playerSave() {
 
 // templates
 var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
-  {tag: 'td', html: '${name}'},
+  {tag: 'td', html: function() { return this.name.replace('/@/g', ''); }},
   {tag: 'td', html: '<button class="btn btn-primary edit">Edit</button>'}
 ]};
 
