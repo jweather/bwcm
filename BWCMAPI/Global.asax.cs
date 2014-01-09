@@ -36,11 +36,8 @@ namespace BWCMAPI {
         }
 
         void checkpoint_Elapsed(object sender, ElapsedEventArgs e) {
-            if (dataDirty) {
-                d("checkpoint data to disk");
+            if (dataDirty)
                 Persistence.saveData();
-                dataDirty = false;
-            }
         }
 
         protected void Session_Start(object sender, EventArgs e) {

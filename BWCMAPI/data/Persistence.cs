@@ -47,18 +47,22 @@ namespace BWCMAPI.data {
         }
 
         public static void saveData() {
-            Dictionary<string, Object> data = new Dictionary<string, object>();
-            data.Add("users", BUser.users);
-            data.Add("widgets", Widget.renderList);
+            try {
+                Dictionary<string, Object> data = new Dictionary<string, object>();
+                data.Add("users", BUser.users);
+                data.Add("widgets", Widget.renderList);
 
-            string path = HostingEnvironment.MapPath("~/App_Data/data.json");
-            string str = Global.json.Serialize(data);
-            FileStream fs = File.Open(path, FileMode.Truncate);
-            byte[] buffer = Encoding.ASCII.GetBytes(str);
-            fs.Write(buffer, 0, buffer.Length);
-            fs.Close();
-            Global.dataDirty = false;
-            Global.d("wrote " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets to data.json");
+                string path = HostingEnvironment.MapPath("~/App_Data/data.json");
+                string str = Global.json.Serialize(data);
+                FileStream fs = File.Open(path, FileMode.Truncate);
+                byte[] buffer = Encoding.ASCII.GetBytes(str);
+                fs.Write(buffer, 0, buffer.Length);
+                fs.Close();
+                Global.dataDirty = false;
+                Global.d("wrote " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets to data.json");
+            } catch (Exception e) {
+                Global.error("Failed to persist data.json: " + e);
+            }
         }
     }
 }
