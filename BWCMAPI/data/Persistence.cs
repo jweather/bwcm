@@ -16,6 +16,7 @@ using System.Web.Hosting;
 
 namespace BWCMAPI.data {
     public class Persistence {
+        private static Object sync = new Object();
         public static void loadData() {
             // clear old data
             BUser.clear();
@@ -48,18 +49,22 @@ namespace BWCMAPI.data {
 
         public static void saveData() {
             try {
-                Dictionary<string, Object> data = new Dictionary<string, object>();
-                data.Add("users", BUser.users);
-                data.Add("widgets", Widget.renderList);
+                lock (sync) {
+                    if (!Global.dataDirty) return;
 
-                string path = HostingEnvironment.MapPath("~/App_Data/data.json");
-                string str = Global.json.Serialize(data);
-                FileStream fs = File.Open(path, FileMode.Truncate);
-                byte[] buffer = Encoding.ASCII.GetBytes(str);
-                fs.Write(buffer, 0, buffer.Length);
-                fs.Close();
-                Global.dataDirty = false;
-                Global.d("wrote " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets to data.json");
+                    Dictionary<string, Object> data = new Dictionary<string, object>();
+                    data.Add("users", BUser.users);
+                    data.Add("widgets", Widget.renderList);
+
+                    string path = HostingEnvironment.MapPath("~/App_Data/data.json");
+                    string str = Global.json.Serialize(data);
+                    FileStream fs = File.Open(path, FileMode.Truncate);
+                    byte[] buffer = Encoding.ASCII.GetBytes(str);
+                    fs.Write(buffer, 0, buffer.Length);
+                    fs.Close();
+                    Global.dataDirty = false;
+                    Global.d("wrote " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets to data.json");
+                }
             } catch (Exception e) {
                 Global.error("Failed to persist data.json: " + e);
             }

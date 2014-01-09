@@ -340,7 +340,7 @@ namespace BWCMAPI {
             mediaTO[] medias = mediaServ.list(fcrit, null);
             foreach (mediaTO media in medias) {
                 if ((DateTime.Now - media.lastModified).TotalHours < 1.0) {
-                    Global.d("skipping media ID = " + media + " -- modified " + (DateTime.Now - media.lastModified).TotalMinutes + " minutes ago");
+                    // don't delete stuff that was just uploaded
                     continue;
                 }
                 if (references.Contains(media.id)) {
