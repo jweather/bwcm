@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="widget.aspx.cs" Inherits="BWCMAPI.widgetrender" %>

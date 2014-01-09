@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>BW Campus Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/bwcm.css" rel="stylesheet" />
+	
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">BW Campus Manager</a>
+        </div>
+        <div class="collapse navbar-collapse">
+			<a id="logout" class="navbar-text pull-right" href="#">Logout</a>
+            <p id="userLoggedIn" class="navbar-text pull-right">
+				Logged in as <a href="#" data-page="passwd" id="userText">nobody</a>.</p>
+		
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#" data-page="players">Manage players</a></li>
+			<li class="admin"><a href="#" data-page="crawl">Update crawl text</a></li>
+			<li class="admin"><a href="#" data-page="users">Manage users</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+	<img src="ajax-loader.gif" id="startupLoader">
+    <div id="pageContainer" class="hidden">
+
+		<div class="page" data-page="login">
+			<h3>Please log in:</h3>
+
+			<table border="0" cellpadding="5">
+				<tr><td><label for="loginUser">User name</label></td>
+					<td><input type="text" id="loginUser"/></td>
+				</tr>
+				<tr><td><label for="loginPass">Password</label></td>
+					<td><input type="password" id="loginPass"/></td>
+				</tr>
+			</table>
+			<button id="login" class="btn btn-primary">Login</button>
+			<span id="loginError"></span>
+		</div>
+
+		<div class="page" data-page="crawl">
+			<h3>Update crawl text:</h3>
+			
+			<textarea id="crawlText" rows="5" cols="80" maxlength="5000"></textarea><br/>
+			<small id="remainingText">5000 characters remaining.</small><br/>
+
+			<button id="updateCrawl" class="btn btn-primary">Save Changes</button>
+		</div>
+
+		<div class="page" data-page="passwd">
+			<h3>Enter new password:</h3>
+			
+			<table border="0" cellpadding="5">
+				<tr><td><label for="passwd1">New password:</label></td>
+					<td><input type="password" id="passwd1"/></td>
+				</tr>
+				<tr><td><label for="passwd2">New password again:</label></td>
+					<td><input type="password" id="passwd2"/></td>
+				</tr>
+			</table>
+			<br/>
+			<button id="changePasswd" class="btn btn-primary">Change Password</button>
+		</div>
+
+		<div class="page" data-page="users">
+			<h3>User list</h3>
+			<table class="table table-bordered" width="60%">
+				<thead>
+					<th>User name</th>
+					<th>Players</th>
+					<th>&nbsp;</th>
+				</thead>
+				<tbody id="userTable">
+				</tbody>
+			</table>
+			<button id="userAdd" class="btn btn-info">Add User</button>
+			
+			<div class="modal fade" id="userEdit"><div class="modal-dialog"><div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Edit User</h4>
+				</div>
+				<div class="modal-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="userName">User name</label>
+							<input type="text" class="form-control" id="userName" placeholder="Enter user name"/>
+						</div>
+						<div class="form-group">
+							<label for="userPass">Password</label>
+							<input type="password" class="form-control" id="userPass" placeholder="Enter password"/>
+						</div>
+						<div class="form-group">
+							<input type="checkbox" id="userAdmin"/>
+							<label for="userAdmin">Is administrator?</label>
+						</div>
+						<div class="form-group" id="userPlayersGroup">
+							<label for="userPlayers">Players</label>
+							<select id="userPlayers" size="8" multiple class="form-control"></select>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="userSave" class="btn btn-default">Save</button>
+					<button type="button" id="userDelete" class="btn btn-danger">Delete User</button>
+				</div>
+			</div></div></div> <!-- userEdit -->
+						
+		</div><!-- users -->
+		
+		<div class="page" data-page="players">
+			<h3>Player list</h3>
+			<table class="table table-bordered" width="60%">
+				<thead>
+					<th>Player</th>
+					<th>&nbsp;</th>
+				</thead>
+				<tbody id="playerTable">
+				</tbody>
+			</table>
+		</div>
+		
+		<div class="page" data-page="player">
+			<h3 id="playerTitle">Editing player</h3>
+			<table class="table table-bordered" width="60%">
+				<thead>
+					<th>Thumbnail</th>
+					<th>Name</th>
+					<th>&nbsp;</th>
+				</thead>
+				<tbody id="slideTable">
+				</tbody>
+			</table>
+			<p>Drag images up or down to organize slides.</p>
+			<button id="slideAdd" class="btn btn-info">Add Slide</button>
+			<button id="playerSave" class="btn btn-primary">Save Changes</button>
+			
+			<div class="modal fade" id="slideEdit"><div class="modal-dialog"><div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Edit Slide</h4>
+				</div>
+				<div class="modal-body">
+					<form role="form">
+						<div class="form-group">
+							<label for="slideName">Slide name</label>
+							<input type="text" class="form-control" id="slideName" placeholder="Enter slide name"/>
+						</div>
+						<div class="form-group">
+							<label for="slideTemplate">Template</label>
+							<select id="slideTemplate" size="3" class="form-control"></select>
+						</div>
+						<div id="slideFields"></div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="slideSave" class="btn btn-default">Save</button>
+					<button type="button" id="slideDelete" class="btn btn-danger">Delete Slide</button>
+				</div>
+			</div></div></div> <!-- slideEdit -->
+			
+		</div> <!-- player -->
+		
+    </div><!-- pageContainer -->
+    
+    
+    <script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="js/json2html-0.4.1.js"></script>
+    <script src="js/jquery.json2html.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+    <script type="text/javascript" src="js/bwcm.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+    <script type="text/javascript" src="js/user.js"></script>
+  </body>
+</html>

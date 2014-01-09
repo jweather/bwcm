@@ -1,0 +1,5 @@
+C:\Zenith\Experiments\Scala\ScalaWS\bin\Debug\ScalaWS.dll
+C:\Zenith\Experiments\Scala\ScalaWS\bin\Debug\ScalaWS.pdb
+C:\Zenith\Experiments\Scala\ScalaWS\obj\Debug\ResolveAssemblyReference.cache
+C:\Zenith\Experiments\Scala\ScalaWS\obj\Debug\ScalaWS.dll
+C:\Zenith\Experiments\Scala\ScalaWS\obj\Debug\ScalaWS.pdb

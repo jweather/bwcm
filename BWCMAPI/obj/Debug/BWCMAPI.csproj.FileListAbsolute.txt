@@ -1,0 +1,9 @@
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\obj\Debug\ResolveAssemblyReference.cache
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\BWCMAPI.dll
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\BWCMAPI.pdb
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\log4net.dll
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\obj\Debug\BWCMAPI.dll
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\obj\Debug\BWCMAPI.pdb
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\ScalaWS.dll
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\ScalaWS.pdb
+C:\Zenith\Baldwin Wallace\Scala\BWCM\BWCMAPI\bin\LinqToTwitter.dll
