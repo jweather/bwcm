@@ -355,7 +355,7 @@ namespace BWCMAPI {
 
         public static void test() {
             messageTO message = new messageTO();
-            message.name = "new crawl test"; message.templateId = 19; message.templateIdSpecified = true;
+            message.name = "new crawl test"; message.templateId = 16; message.templateIdSpecified = true;
             message = messageServ.create(message, null);
         }
             
