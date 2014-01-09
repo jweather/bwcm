@@ -153,7 +153,7 @@ namespace BWCMAPI {
                             text = text.Replace("\n", "          ");
 
                             Scala.updateCrawl(text);
-                            audit("update crawl: " + text.Substring(0, 80));
+                            audit("update crawl: " + text.Substring(0, Math.Min(text.Length, 60)));
                             break;
 
                         // debug
