@@ -352,6 +352,13 @@ namespace BWCMAPI {
             if (referencedMedia == null) return true;
             return referencedMedia.Contains(p);
         }
+
+        public static void test() {
+            messageTO message = new messageTO();
+            message.name = "new crawl test"; message.templateId = 19; message.templateIdSpecified = true;
+            message = messageServ.create(message, null);
+        }
+            
     }
 
     class ThumbCache {
