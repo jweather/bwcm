@@ -196,7 +196,8 @@ namespace BWCMAPI {
 
                     fields[f].value = field.mediaID.ToString();
                 }
-                message.approvalStatusSpecified = false;
+                message.approvalStatusSpecified = true;
+                message.approvalStatus = ScalaWS.Message.approvalStatusEnum.APPROVED;
                 message = messageServ.create(message, fields);
                 if (oldIDs.Contains(slide.id))
                     summary += " -- updated " + slide.id + "=>" + message.id + ": " + message.name;
