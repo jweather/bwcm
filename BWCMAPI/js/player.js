@@ -9,6 +9,9 @@ function refreshPlayerTable() {
 		players = players.sort(function(a,b) {
 			if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; 
 		});
+		for (var i = 0; i < players.length; i++)
+			players[i].name = players[i].name.replace(/@/g, ''); // used to sort them first in the list
+			
 		$('#playerTable').html('');
 		$('#playerTable').json2html(players, playerRow);
 	});
@@ -323,7 +326,7 @@ $('#playerSave').click(function() { playerSave(); });
 function playerSave() {
 	$.post('/api/players/update', JSON.stringify(editPlayer), function(r) {
 		editPlayer = r.result;
-		$('#slideTable').html('<img src="ajax-loading.gif">');
+		$('#slideTable').html('<img src="ajax-loader.gif">');
 		setTimeout(refreshPlayer, 1000); // update slide list to show new thumbnail URL
 		playerDirty = false;
 		$('#playerSave').hide();
@@ -336,7 +339,7 @@ function playerSave() {
 
 // templates
 var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
-  {tag: 'td', html: function() { return this.name.replace('/@/g', ''); }},
+  {tag: 'td', html: '${name}'},
   {tag: 'td', html: '<button class="btn btn-primary edit">Edit</button>'}
 ]};
 
