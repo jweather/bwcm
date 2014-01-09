@@ -79,7 +79,7 @@ $('#userDelete').click(function() {
 		$('#userEdit').modal('hide');
 		return;
 	}
-	$.get('/api/user/delete', {user: editUser.user}, function(r) {
+	$.get('/api/users/delete', {user: editUser.user}, function(r) {
 		console.log(r);
 		$('#userEdit').modal('hide');
 		refreshUserTable();
