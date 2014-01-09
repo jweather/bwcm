@@ -43,6 +43,7 @@ namespace BWCMAPI.data {
                     Widget.renderList.Add(w);
                 }
             }
+            Global.d("loaded " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets from data.json");
         }
 
         public static void saveData() {
@@ -57,6 +58,7 @@ namespace BWCMAPI.data {
             fs.Write(buffer, 0, buffer.Length);
             fs.Close();
             Global.dataDirty = false;
+            Global.d("wrote " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets to data.json");
         }
     }
 }
