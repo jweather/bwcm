@@ -34,9 +34,6 @@ namespace BWCMAPI {
                 BUser user = (BUser)Session["user"], u;
                 bool checkUser = false, checkAdmin = false;
                 switch (Request.PathInfo) {
-                    case "/bork":
-                        Scala.test();
-                        break;
                     case "/info":
                         // check if user is logged in
                         response.Add("user", Session["user"]);

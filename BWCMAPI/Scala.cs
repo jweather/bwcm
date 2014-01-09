@@ -196,6 +196,8 @@ namespace BWCMAPI {
 
                     fields[f].value = field.mediaID.ToString();
                 }
+                
+                // workaround braindead 1.x API issues in release 10
                 message.approvalStatus = ScalaWS.Message.approvalStatusEnum.DRAFT; message.approvalStatusSpecified = true;
                 message = messageServ.create(message, fields);
                 if (oldIDs.Contains(slide.id))
@@ -337,6 +339,10 @@ namespace BWCMAPI {
             int mediacount = 0;
             mediaTO[] medias = mediaServ.list(fcrit, null);
             foreach (mediaTO media in medias) {
+                if ((DateTime.Now - media.lastModified).TotalHours < 1.0) {
+                    Global.d("skipping media ID = " + media + " -- modified " + (DateTime.Now - media.lastModified).TotalMinutes + " minutes ago");
+                    continue;
+                }
                 if (references.Contains(media.id)) {
                     mediacount++;
                     continue;
@@ -353,13 +359,6 @@ namespace BWCMAPI {
             if (referencedMedia == null) return true;
             return referencedMedia.Contains(p);
         }
-
-        public static void test() {
-            messageTO message = new messageTO();
-            message.name = "new crawl test"; message.templateId = 16; message.templateIdSpecified = true;
-            message = messageServ.create(message, null);
-        }
-            
     }
 
     class ThumbCache {
