@@ -65,6 +65,25 @@ namespace BWCMAPI.data {
             return mediaID;
         }
 
+        // fit text in box
+        public void fitText(Graphics g, Color c, string fontFamily, string text, RectangleF fit) {
+            SizeF textSize;
+            Font font;
+            float pt = 128;
+            while (true) {
+                font = new Font(fontFamily, pt);
+                textSize = g.MeasureString(text, font, (int)fit.Width);
+                if (textSize.Height < fit.Height)
+                    break;
+                pt = pt - pt / 10;
+                if (pt <= 8) break;
+            }
+
+            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
+            format.LineAlignment = StringAlignment.Center;
+            g.DrawString(text, font, new SolidBrush(c), fit, format);
+        }
+
         abstract protected void render(Graphics g);
         abstract protected Size getSize();
         abstract protected string key();
@@ -88,25 +107,12 @@ namespace BWCMAPI.data {
 
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
-            float pt = 128;
             int marginX = 16, marginY = 8;
-            SizeF textSize;
-            Font font;
-            // fit text in box
-            while (true) {
-                font = new Font("Calibri", pt);
-                textSize = g.MeasureString(text, font, W - marginX * 2);
-                if (textSize.Height < H - marginY*2)
-                    break;
-                pt = pt - pt/10;
-                if (pt <= 8) break;
-            }
-            g.DrawImage(new Bitmap(Global.appData("1059x94 text.png")), new Rectangle(0, 0, W, H));
 
-            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
-            format.LineAlignment = StringAlignment.Center;
-            g.DrawString(text, font, new SolidBrush(Color.White), new RectangleF(marginX, marginY, W-marginX*2, H-marginY*2), format);
+            g.DrawImage(new Bitmap(Global.appData("1059x94 text.png")), new Rectangle(0, 0, W, H));
+            fitText(g, Color.White, "Calibri", text, new RectangleF(marginX, marginY, W - marginX * 2, H - marginY * 2));
         }
+
         protected override Size getSize() {
             return new Size(1059, 94);
         }
@@ -165,17 +171,13 @@ namespace BWCMAPI.data {
                 } catch { }
             }
             tweets = tweets.OrderByDescending(item => item.CreatedAt);
-
-            Font font = new Font("Calibri", 14);
             string text = "";
             foreach (Status tweet in tweets) {
                 text = tweet.ScreenName + ": " + tweet.Text.Replace("\n", " ");
                 break;
             }
 
-            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
-            format.LineAlignment = StringAlignment.Center;
-            g.DrawString(text, font, new SolidBrush(Color.White), new RectangleF(100, 16, 945, 54), format);
+            fitText(g, Color.White, "Calibri", text, new RectangleF(100, 16, 945, 54));
         }
 
         protected override string key() {
