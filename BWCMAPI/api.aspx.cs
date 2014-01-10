@@ -170,7 +170,7 @@ namespace BWCMAPI {
                 }
             } catch (ArgumentException e) {
                 result = HttpStatusCode.BadRequest;
-                response.Add("message", e.Message);
+                response.Add("message", e.ToString());
             } catch (Exception e) {
                 d(e.ToString());
                 response.Add("error", "Exception while handling request: " + e.Message);

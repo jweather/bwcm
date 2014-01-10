@@ -35,7 +35,7 @@ namespace BWCMAPI {
                         foreach (Widget wi in Widget.renderList) {
                             if (!Scala.mediaReferenced(wi.mediaID)) {
                                 removeList.Add(wi);
-                            } else if (wi.needRefresh()) {
+                            } else if (wi.needRefresh() || q["all"] != null) {
                                 count++;
                                 wi.refresh(); // render and upload new version
                             }

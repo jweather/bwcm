@@ -366,7 +366,9 @@ var templateField = {tag: 'div', 'class': 'form-group', children: [
 				{tag: 'li', 'class': 'twitter', children: 
 					[{tag: 'a', href: '#${name}-twitter', 'data-toggle': 'tab', html: 'Twitter', 'data-widget': 'twitter'}]},
 				{tag: 'li', 'class': 'weather', children: 
-					[{tag: 'a', href: '#${name}-weather', 'data-toggle': 'tab', html: 'Weather', 'data-widget': 'weather'}]}
+					[{tag: 'a', href: '#${name}-weather', 'data-toggle': 'tab', html: 'Weather', 'data-widget': 'weather'}]},
+				{tag: 'li', 'class': 'none', children: 
+					[{tag: 'a', href: '#${name}-none', 'data-toggle': 'tab', html: 'None', 'data-widget': 'none'}]}
 			]},
 			{tag: 'div', 'class': 'tab-content', children: [
 				{tag: 'div', 'class': 'tab-pane', id: '${name}-image', children: [
@@ -385,6 +387,9 @@ var templateField = {tag: 'div', 'class': 'form-group', children: [
 				]},
 				{tag: 'div', 'class': 'tab-pane', id: '${name}-weather', children: [
 					{tag: 'p', html: 'Shows current weather conditions.'}
+				]},
+				{tag: 'div', 'class': 'tab-pane', id: '${name}-none', children: [
+					{tag: 'p', html: 'No content.'}
 				]}
 			]},
 		]}, // fieldValues

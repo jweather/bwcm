@@ -25,6 +25,7 @@ namespace BWCMAPI.data {
             types.Add("field", typeof(Field));
             types.Add("widget", typeof(Widget));
             types.Add("text", typeof(WidgetText));
+            types.Add("none", typeof(WidgetNone));
             types.Add("twitter", typeof(WidgetTwitter));
             types.Add("weather", typeof(WidgetWeather));
             types.Add("templateinfo", typeof(TemplateInfo));

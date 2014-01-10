@@ -181,25 +181,29 @@ namespace BWCMAPI {
                 Template template = templates.Find(Template.byID(slide.templateID));
                 messageTO message = new messageTO();
                 message.name = slide.name; message.templateId = slide.templateID; message.templateIdSpecified = true;
-                messageDataFieldTO[] fields = new messageDataFieldTO[slide.fields.Count];
+                List<messageDataFieldTO> fields = new List<messageDataFieldTO>();
                 for (int f=0; f < slide.fields.Count; f++) {
                     Field field = slide.fields[f];
                     Field tfield = template.fields.Find(Field.byName(field.name));
                     if (tfield == null) continue; // no such field in template
 
-                    fields[f] = new messageDataFieldTO();
-                    fields[f].id = tfield.templateFieldID; fields[f].idSpecified = true; // use template field ID
-                    fields[f].name = field.name;
+                    if (field.widget != null && field.widget is WidgetNone)
+                        continue; // no field value
+
+                    messageDataFieldTO fieldTO = new messageDataFieldTO();
+                    fieldTO.id = tfield.templateFieldID; fieldTO.idSpecified = true; // use template field ID
+                    fieldTO.name = field.name;
 
                     if (field.widget != null)
                         field.mediaID = field.widget.upload();
 
-                    fields[f].value = field.mediaID.ToString();
+                    fieldTO.value = field.mediaID.ToString();
+                    fields.Add(fieldTO);
                 }
                 
                 // workaround braindead 1.x API issues in release 10
                 message.approvalStatus = ScalaWS.Message.approvalStatusEnum.DRAFT; message.approvalStatusSpecified = true;
-                message = messageServ.create(message, fields);
+                message = messageServ.create(message, fields.ToArray());
                 if (oldIDs.Contains(slide.id))
                     summary += " -- updated " + slide.id + "=>" + message.id + ": " + message.name;
                 else

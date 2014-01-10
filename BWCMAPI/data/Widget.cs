@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Data;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 using System.Drawing;
-using System.IO;
-using LinqToTwitter;
-using System.Net;
-using System.Xml;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Web.Hosting;
+using System.Xml;
+using LinqToTwitter;
 
 namespace BWCMAPI.data {
     public abstract class Widget {
@@ -96,20 +88,26 @@ namespace BWCMAPI.data {
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
             float pt = 128;
+            int marginX = 16, marginY = 8;
             SizeF textSize;
             Font font;
+            // fit text in box
             while (true) {
                 font = new Font("Calibri", pt);
-                textSize = g.MeasureString(text, font, W - 20);
-                if (textSize.Height < H - 20)
+                textSize = g.MeasureString(text, font, W - marginX * 2);
+                if (textSize.Height < H - marginY*2)
                     break;
                 pt = pt - pt/10;
                 if (pt <= 8) break;
             }
-            g.DrawString(text, font, new SolidBrush(Color.White), new RectangleF((W - textSize.Width) / 2, (H - textSize.Height) / 2, W-20, H-20));
+            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/1059x94 text.png")), new Rectangle(0, 0, W, H));
+
+            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
+            format.LineAlignment = StringAlignment.Center;
+            g.DrawString(text, font, new SolidBrush(Color.White), new RectangleF(marginX, marginY, W-marginX*2, H-marginY*2), format);
         }
         protected override Size getSize() {
-            return new Size(499, 666);
+            return new Size(1059, 94);
         }
         protected override string key() {
             return "text " + text;
@@ -124,13 +122,13 @@ namespace BWCMAPI.data {
         public WidgetTwitter() { }
 
         protected override Size getSize() {
-            return new Size(499, 666);
+            return new Size(1059, 94);
         }
         
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
-            int margin = 20;
-            g.Clear(Color.Bisque);
+
+            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/1059x94 twitter.png")), new Rectangle(0, 0, W, H));
 
             if (handles == null) return;
 
@@ -167,22 +165,16 @@ namespace BWCMAPI.data {
             }
             tweets = tweets.OrderByDescending(item => item.CreatedAt);
 
-            Font font = new Font("Calibri", 18);
-            SizeF textSize;
+            Font font = new Font("Calibri", 14);
             string text = "";
-
             foreach (Status tweet in tweets) {
-                string temp = "";
-                if (text != "") temp = text + "\n\n";
-                temp += tweet.ScreenName + ": " + tweet.Text;
-
-                textSize = g.MeasureString(temp, font, W - margin*2);
-                if (textSize.Height > H - margin*2) break; // no more room
-                text = temp;
+                text = tweet.ScreenName + ": " + tweet.Text.Replace("\n", " ");
+                break;
             }
 
-
-            g.DrawString(text, font, new SolidBrush(Color.Black), new RectangleF(margin, margin, W - margin*2, H - margin*2));
+            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
+            format.LineAlignment = StringAlignment.Center;
+            g.DrawString(text, font, new SolidBrush(Color.White), new RectangleF(100, 16, 945, 54), format);
         }
 
         protected override string key() {
@@ -199,7 +191,7 @@ namespace BWCMAPI.data {
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
 
-            g.Clear(Color.Gray);
+            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/423x423 weather bg.png")), new Rectangle(0, 0, W, H));
 
             string temp = "", cond = "";
             try {
@@ -228,17 +220,17 @@ namespace BWCMAPI.data {
                     path = HostingEnvironment.MapPath("~/App_Data/wxicons/3200.png");
                 Bitmap b = new Bitmap(path);
 
-                g.DrawImage(b, 250, 50);
+                g.DrawImage(b, 250, 70);
 
             } catch (Exception e) {
                 Global.d("WX exception: " + e.ToString());
             }
 
-            Font tfont = new Font("Calibri", 72);
+            Font tfont = new Font("Futura", 128);
             Font cfont = new Font("Calibri", 28);
 
-            Brush brush = new SolidBrush(Color.White);
-            g.DrawString(temp, tfont, brush, 40, 40);
+            Brush brush = new SolidBrush(Color.FromArgb(100, 100, 100));
+            g.DrawString(temp, tfont, brush, 40, 240);
 
             SizeF csize = g.MeasureString(cond, cfont);
             g.DrawString(cond, cfont, brush, 250 + (128 - csize.Width) / 2, 190);
@@ -247,7 +239,7 @@ namespace BWCMAPI.data {
         }
 
         protected override Size getSize() {
-            return new Size(499, 666); // todo, not determined yet
+            return new Size(423, 423);
         }
 
         protected override string key() {
@@ -255,6 +247,24 @@ namespace BWCMAPI.data {
         }
         public override bool needRefresh() {
             return true; // todo check time since last refresh
+        }
+    }
+
+    public class WidgetNone : Widget {
+        public WidgetNone() { }
+
+        protected override void render(Graphics g) {
+            g.Clear(Color.White);
+            Global.error("Why are you rendering a WidgetNone?");
+        }
+        protected override Size getSize() {
+            return new Size(100, 100);
+        }
+        protected override string key() {
+            return "empty";
+        }
+        public override bool needRefresh() {
+            return false;
         }
     }
 }
