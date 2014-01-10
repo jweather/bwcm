@@ -8,6 +8,7 @@ using System.Net;
 using System.Web.Hosting;
 using System.Xml;
 using LinqToTwitter;
+using System.Drawing.Text;
 
 namespace BWCMAPI.data {
     public abstract class Widget {
@@ -100,7 +101,7 @@ namespace BWCMAPI.data {
                 pt = pt - pt/10;
                 if (pt <= 8) break;
             }
-            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/1059x94 text.png")), new Rectangle(0, 0, W, H));
+            g.DrawImage(new Bitmap(Global.appData("1059x94 text.png")), new Rectangle(0, 0, W, H));
 
             StringFormat format = new StringFormat(StringFormatFlags.NoClip);
             format.LineAlignment = StringAlignment.Center;
@@ -128,7 +129,7 @@ namespace BWCMAPI.data {
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
 
-            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/1059x94 twitter.png")), new Rectangle(0, 0, W, H));
+            g.DrawImage(new Bitmap(Global.appData("1059x94 twitter.png")), new Rectangle(0, 0, W, H));
 
             if (handles == null) return;
 
@@ -191,7 +192,7 @@ namespace BWCMAPI.data {
         protected override void render(Graphics g) {
             int W = getSize().Width, H = getSize().Height;
 
-            g.DrawImage(new Bitmap(HostingEnvironment.MapPath("~/App_Data/423x423 weather bg.png")), new Rectangle(0, 0, W, H));
+            g.DrawImage(new Bitmap(Global.appData("423x423 weather bg.png")), new Rectangle(0, 0, W, H));
 
             string temp = "", cond = "";
             try {
@@ -215,9 +216,9 @@ namespace BWCMAPI.data {
                 } catch { }
 
                 // draw wxicon
-                string path = HostingEnvironment.MapPath("~/App_Data/wxicons/" + code + ".png");
+                string path = Global.appData("wxicons/" + code + ".png");
                 if (!File.Exists(path))
-                    path = HostingEnvironment.MapPath("~/App_Data/wxicons/3200.png");
+                    path = Global.appData("wxicons/3200.png");
                 Bitmap b = new Bitmap(path);
 
                 g.DrawImage(b, 250, 70);
@@ -226,7 +227,8 @@ namespace BWCMAPI.data {
                 Global.d("WX exception: " + e.ToString());
             }
 
-            Font tfont = new Font("Futura", 128);
+            PrivateFontCollection fc = new PrivateFontCollection(); fc.AddFontFile(Global.appData("Futura Condensed Medium.ttf"));
+            Font tfont = new Font(fc.Families[0], 128);
             Font cfont = new Font("Calibri", 28);
 
             Brush brush = new SolidBrush(Color.FromArgb(100, 100, 100));

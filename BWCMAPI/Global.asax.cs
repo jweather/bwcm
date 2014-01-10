@@ -12,6 +12,7 @@ using log4net.Config;
 using System.Web.Script.Serialization;
 using BWCMAPI.data;
 using System.Timers;
+using System.Web.Hosting;
 
 namespace BWCMAPI {
     public class Global : System.Web.HttpApplication {
@@ -95,6 +96,10 @@ namespace BWCMAPI {
 
         public static void audit(string user, string msg) {
             log.Info(user + ": " + msg);
+        }
+
+        public static string appData(string p) {
+            return HostingEnvironment.MapPath("~/App_Data/" + p);
         }
     }
 }
