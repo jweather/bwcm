@@ -30,6 +30,13 @@ namespace BWCMAPI.data {
             }
         }
 
+        public void sortFields() {
+            List<Field> reorderFields = new List<Field>();
+            foreach (FieldInfo fi in info.fields)
+                reorderFields.Add(fields.Find(Field.byName(fi.n)));
+            fields = reorderFields;
+        }
+
         static public Predicate<Template> byID(int id) {
             return delegate(Template t) {
                 return t.id == id;

@@ -191,9 +191,15 @@ namespace BWCMAPI.data {
         public WidgetWeather() { }
 
         protected override void render(Graphics g) {
-            if (W != 423 || H != 423)
+            if (W == 423 && H == 423) {
+                g.DrawImage(new Bitmap(Global.appData("423x423 weather bg.png")), new Rectangle(0, 0, W, H));
+            } else if (W == 423 && H == 422) { // hack for different bg
+                g.DrawImage(new Bitmap(Global.appData("423x422 weather bg.png")), new Rectangle(0, 0, W, H));
+            } else if (W == 298 && H == 340) { // hack for different bg
+                g.DrawImage(new Bitmap(Global.appData("298x340 weather bg.png")), new Rectangle(0, 0, W, H));
+            } else {
                 Global.error("Drawing WidgetWeather in unknown frame size: " + W + "x" + H);
-            g.DrawImage(new Bitmap(Global.appData("423x423 weather bg.png")), new Rectangle(0, 0, W, H));
+            }
 
             string temp = "", cond = "";
             try {
@@ -222,7 +228,10 @@ namespace BWCMAPI.data {
                     path = Global.appData("wxicons/3200.png");
                 Bitmap b = new Bitmap(path);
 
-                g.DrawImage(b, 250, 70);
+                if (W == 423)
+                    g.DrawImage(b, 250, 70);
+                else
+                    g.DrawImage(b, 120, 50);
 
             } catch (Exception e) {
                 Global.d("WX exception: " + e.ToString());
@@ -233,12 +242,16 @@ namespace BWCMAPI.data {
             Font cfont = new Font("Calibri", 28);
 
             Brush brush = new SolidBrush(Color.FromArgb(100, 100, 100));
-            g.DrawString(temp, tfont, brush, 40, 240);
+            if (W == 423)
+                g.DrawString(temp, tfont, brush, 40, 240);
+            else
+                g.DrawString(temp, tfont, brush, 10, 180);
 
             SizeF csize = g.MeasureString(cond, cfont);
-            g.DrawString(cond, cfont, brush, 250 + (128 - csize.Width) / 2, 190);
-
-            //g.DrawString("Updated at " + DateTime.Now.ToShortTimeString(), cfont, brush, 40, 280);
+            if (W == 423)
+                g.DrawString(cond, cfont, brush, 250 + (128 - csize.Width) / 2, 190);
+            else
+                g.DrawString(cond, cfont, brush, 120 + (128 - csize.Width) / 2, 170);
         }
 
         protected override string key() {

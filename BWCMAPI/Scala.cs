@@ -75,6 +75,7 @@ namespace BWCMAPI {
                             field.templateFieldID = fieldTO.id;
                             template.fields.Add(field);
                         }
+                        template.sortFields();
                         templates.Add(template);
                     } catch (Exception e) {
                         Global.d("Failed to load template data: " + e);
