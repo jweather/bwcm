@@ -263,4 +263,20 @@ namespace BWCMAPI.data {
             return false;
         }
     }
+
+    public class WidgetImage : Widget {
+        public WidgetImage() {}
+
+        protected override void render(Graphics g) {
+            g.Clear(Color.White);
+            Global.error("Why are you rendering a WidgetImage?");
+        }
+        protected override string key() {
+            return "";
+        }
+        public override bool needRefresh() {
+            return false;
+        }
+    }
+
 }

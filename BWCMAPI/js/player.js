@@ -121,15 +121,6 @@ $('#slideTemplate').change(function() {
 			editSlide.fieldByName[fieldName] = field;
 		}
 		
-		if (field.widget) {
-			valueType = field.widget.__type;
-			if (valueType == 'text') {
-				$('#' + fieldName + '-textValue').val(field.widget.text);
-			} else if (valueType == 'twitter') {
-				$('#' + fieldName + '-twitterValue').val(field.widget.handles);
-			}
-		}
-
 		// hide tabs that don't apply
 		var allowed = [];
 		var tf = t.fieldByName[fieldName];
@@ -141,8 +132,21 @@ $('#slideTemplate').change(function() {
 				$(this).hide();
 		});
 		
+		if (field.widget) {
+			valueType = field.widget.__type;
+			if (valueType == 'text') {
+				$('#' + fieldName + '-textValue').val(field.widget.text);
+			} else if (valueType == 'twitter') {
+				$('#' + fieldName + '-twitterValue').val(field.widget.handles);
+			}
+		} else {
+			valueType = allowed[0];
+			field.widget = {__type: valueType};
+		}
+		field.widget.W = tf.info.w; field.widget.H = tf.info.h;
+		
+
 		// show active tab
-		if (valueType == null) valueType = allowed[0];
 		$('#slideEdit a[href="#' + fieldName + '-' + valueType + '"]').tab('show');
 		previewWidget(fieldName);
 	});
@@ -150,12 +154,16 @@ $('#slideTemplate').change(function() {
 
 // change field type
 $(document).on('click', '#slideEdit .nav-tabs a', function(e) {
+	var fieldName = $(this).parents('.fieldRow').data('name');
+	var field = editSlide.fieldByName[fieldName];
+	var widget = $(this).data('widget');
+	field.widget['__type'] = widget;
+
 	editSlide.changed = true;
 	e.preventDefault();
 	$(this).tab('show');
-	var widget = $(this).data('widget');
-	var field = $(this).parents('.fieldRow').data('name');
-	previewWidget(field);
+	
+	previewWidget(fieldName);
 });
 
 var uploadedDataFor = {}
@@ -164,11 +172,11 @@ $('#slideEdit').on('hide.bs.modal', function(e) {
 	if (slideEditClosing) return;
 	slideEditClosing = true;
 	if (editSlide && editSlide.changed) {
-		var yes = confirm("Save changes before closing?");
-		if (!yes) return;
-		$('#slideSave').click();
-		slideEditClosing = false;
-		return e.preventDefault();
+		var yes = confirm("Close without saving?");
+		if (!yes) {
+			slideEditClosing = false;
+			return e.preventDefault();
+		}
 	} else {
 		editSlide = null;
 	}
@@ -178,22 +186,6 @@ $('#slideEdit').on('hidden.bs.modal', function() {
 	uploadedDataFor = {};
 	slideEditClosing = false;
 });
-
-function saveWidget(fieldName) {
-	var field = editSlide.fieldByName[fieldName];
-	var widget = $('#field-' + fieldName + ' .nav-tabs li.active a').data('widget');
-	if (widget == 'image') {
-		field.widget = null;
-		return;
-	}
-	
-	field.widget = {__type: widget};
-	if (widget == 'text') {
-		field.widget.text = $('#' + fieldName + '-textValue').val();
-	} else if (widget == 'twitter') {
-		field.widget.handles = $('#' + fieldName + '-twitterValue').val();
-	}
-}
 
 function previewWidget(fieldName) {
 	var field = editSlide.fieldByName[fieldName];
@@ -214,7 +206,6 @@ function previewWidget(fieldName) {
 		if (!field.widget) {
 			field.widget = {__type: widget};
 		}
-		field.widget.W = finfo.w; field.widget.H = finfo.h;
 		src = '/widget.aspx/preview?widget=' + encodeURIComponent(JSON.stringify(field.widget));
 	}
 	$(preview).attr('src', src);
@@ -223,11 +214,19 @@ function previewWidget(fieldName) {
 var widgetPreview = {};
 $(document).on('input', '.twitterValue, .textValue', function() {
 	editSlide.changed = true;
-	var name = $(this).parents('.fieldRow').data('name');
+	var fieldName = $(this).parents('.fieldRow').data('name');
+	var field = editSlide.fieldByName[fieldName];
+	var widget = $('#field-' + fieldName + ' .nav-tabs li.active a').data('widget');
+	if (widget == 'text') {
+		field.widget.text = $('#' + fieldName + '-textValue').val();
+	} else if (widget == 'twitter') {
+		field.widget.handles = $('#' + fieldName + '-twitterValue').val();
+	}
+	
 	// reset timeout to refresh widget preview
-	if (widgetPreview[name])
-		clearInterval(widgetPreview[name]);
-	widgetPreview[name] = setTimeout(function() { saveWidget(name); previewWidget(name); }, 500);
+	if (widgetPreview[fieldName])
+		clearInterval(widgetPreview[fieldName]);
+	widgetPreview[fieldName] = setTimeout(function() { previewWidget(fieldName); }, 500);
 });
 
 $(document).on('change', '#slideEdit input[type=file]', function(e) {

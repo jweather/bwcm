@@ -59,36 +59,6 @@ namespace BWCMAPI {
                 if (cats.Length != 1) throw new Exception("Did not find managed category named '" + Global.cfg("catManaged") + "' (Web.config:catManaged)");
                 managedCatID = cats[0].id;
 
-                plcrit[0].column = "categoryId"; plcrit[0].value = managedCatID.ToString();
-                ScalaWS.Playlist.playlistTO[] playlists = playlistServ.list(plcrit, null);
-                foreach (playlistTO playlist in playlists) {
-                    Player player = new Player(playlist.id, playlist.name);
-                    players.Add(player);
-                    ScalaWS.Playlist.playlistItemTO[] items = playlistServ.getPlaylistItems(playlist.id, true);
-                    foreach (ScalaWS.Playlist.playlistItemTO item in items) {
-                        try {
-                            // if (item.playlistItemType != playlistItemTypeEnum.MESSAGE) continue; // not supported by ScalaWS, hopefully no non-message items show up in this playlist
-                            // item.mediaID is the message ID, item.id is the playlistItemID
-                            messageTO message = messageServ.get(item.mediaId, true);
-                            Slide slide = new Slide(item.mediaId, message.name);
-                            player.slides.Add(slide);
-
-                            slide.templateID = message.templateId;
-
-                            messageDataFieldTO[] fields = messageServ.getFiles(item.mediaId, true);
-                            foreach (messageDataFieldTO fieldTO in fields) {
-                                Field field = new Field(fieldTO.name);
-                                field.mediaID = Convert.ToInt32(fieldTO.value);
-                                field.widget = Widget.renderList.Find(Widget.byMediaID(field.mediaID));
-
-                                slide.fields.Add(field);
-                            }
-                        } catch (Exception e) {
-                            Global.d("Failed to load playlist item in " + player.name + ": " + e);
-                        }
-                    }
-                }
-
                 // get templates in master category
                 ScalaWS.Template.searchCriteriaTO[] tcrit = new ScalaWS.Template.searchCriteriaTO[1]; tcrit[0] = new ScalaWS.Template.searchCriteriaTO();
                 tcrit[0].column = "categoryId"; tcrit[0].value = managedCatID.ToString();
@@ -108,6 +78,53 @@ namespace BWCMAPI {
                         templates.Add(template);
                     } catch (Exception e) {
                         Global.d("Failed to load template data: " + e);
+                    }
+                }
+
+                // find playlists
+                plcrit[0].column = "categoryId"; plcrit[0].value = managedCatID.ToString();
+                ScalaWS.Playlist.playlistTO[] playlists = playlistServ.list(plcrit, null);
+                foreach (playlistTO playlist in playlists) {
+                    Player player = new Player(playlist.id, playlist.name);
+                    players.Add(player);
+                    ScalaWS.Playlist.playlistItemTO[] items = playlistServ.getPlaylistItems(playlist.id, true);
+                    foreach (ScalaWS.Playlist.playlistItemTO item in items) {
+                        try {
+                            // if (item.playlistItemType != playlistItemTypeEnum.MESSAGE) continue; // not supported by ScalaWS, hopefully no non-message items show up in this playlist
+                            // item.mediaID is the message ID, item.id is the playlistItemID
+                            messageTO message = messageServ.get(item.mediaId, true);
+                            Slide slide = new Slide(item.mediaId, message.name);
+                            player.slides.Add(slide);
+
+                            slide.templateID = message.templateId;
+
+                            messageDataFieldTO[] fields = messageServ.getFiles(item.mediaId, true);
+                            List<string> foundFields = new List<string>();
+                            foreach (messageDataFieldTO fieldTO in fields) {
+                                Field field = new Field(fieldTO.name);
+                                field.mediaID = Convert.ToInt32(fieldTO.value);
+                                field.widget = Widget.renderList.Find(Widget.byMediaID(field.mediaID));
+                                if (field.widget == null) {
+                                    field.widget = new WidgetImage(); // the non-widget widget
+                                }
+
+                                slide.fields.Add(field);
+                                foundFields.Add(fieldTO.name);
+                            }
+
+                            // missing fields = WidgetNone
+                            Template t = templates.Find(Template.byID(slide.templateID));
+                            foreach (Field tf in t.fields) {
+                                if (!foundFields.Contains(tf.name)) {
+                                    Field nf = new Field(tf.name);
+                                    nf.widget = new WidgetNone();
+                                    slide.fields.Add(nf);
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            Global.d("Failed to load playlist item in " + player.name + ": " + e);
+                        }
                     }
                 }
 
@@ -194,7 +211,7 @@ namespace BWCMAPI {
                     fieldTO.id = tfield.templateFieldID; fieldTO.idSpecified = true; // use template field ID
                     fieldTO.name = field.name;
 
-                    if (field.widget != null)
+                    if (field.widget != null && !(field.widget is WidgetImage))
                         field.mediaID = field.widget.upload();
 
                     fieldTO.value = field.mediaID.ToString();
