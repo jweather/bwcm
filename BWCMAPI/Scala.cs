@@ -97,7 +97,7 @@ namespace BWCMAPI {
                 templateTO[] temps = templateServ.list(tcrit, null);
                 foreach (templateTO templateTO in temps) {
                     try {
-                        Template template = new Template(templateTO.id, templateTO.name, templateTO.description);
+                        Template template = new Template(templateTO.id, templateTO.name);
                         templateDataFieldTO[] fields = templateServ.getFiles(template.id, true);
                         foreach (templateDataFieldTO fieldTO in fields) {
                             if (fieldTO.type != templateFieldTypeEnum.IMAGE) continue;

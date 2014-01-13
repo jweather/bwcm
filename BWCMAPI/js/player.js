@@ -208,6 +208,8 @@ function previewWidget(fieldName) {
 			// generate an appropriate placeholder image using the desired width/height of the image
 			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.w + 'x' + finfo.h;
 		}
+	} else if (widget == 'none') {
+		src = '';
 	} else {
 		if (!field.widget) {
 			field.widget = {__type: widget};

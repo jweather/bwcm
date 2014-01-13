@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
+using System.IO;
 
 namespace BWCMAPI.data {
     public class Template {
@@ -18,11 +19,12 @@ namespace BWCMAPI.data {
         public List<Field> fields = new List<Field>();
         public TemplateInfo info;
 
-        public Template(int id, string name, string description) {
+        public Template(int id, string name) {
             this.id = id;
             this.name = name.Replace(".scb", "");
             try {
-                info = Global.json.Deserialize<TemplateInfo>(description);
+                string blob = File.ReadAllText(Global.appData(this.name + ".json"));
+                info = Global.json.Deserialize<TemplateInfo>(blob);
             } catch (Exception e) {
                 Global.error("Failed to parse TemplateInfo for " + name + ": " + e.Message);
             }
