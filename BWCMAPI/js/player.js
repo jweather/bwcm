@@ -27,7 +27,7 @@ function refreshPlayerTable() {
 			if (t.info != null && t.info.fields != null) {
 				for (var fi = 0; fi < t.info.fields.length; fi++) {
 					var finfo = t.info.fields[fi];
-					t.fieldByName[finfo.name].info = finfo;
+					t.fieldByName[finfo.n].info = finfo;
 				}
 			}
 		}
@@ -112,7 +112,7 @@ $('#slideTemplate').change(function() {
 	$('#slideFields').json2html(t.fields, templateField);
 	$('#slideFields .fieldRow').each(function() {
 		var fieldName = $(this).data('name');
-		var valueType = 'image';
+		var valueType = null;
 
 		var field = editSlide.fieldByName[fieldName];
 		if (!editSlide.fieldByName[fieldName]) {
@@ -131,10 +131,10 @@ $('#slideTemplate').change(function() {
 		}
 
 		// hide tabs that don't apply
-		var allowed = ['image']; // always allowed?
+		var allowed = [];
 		var tf = t.fieldByName[fieldName];
-		if (tf.info && tf.info.widgets)
-			allowed = allowed.concat(tf.info.widgets);
+		if (tf.info && tf.info.ws)
+			allowed = allowed.concat(tf.info.ws);
 		$(this).find('.nav-tabs a').each(function() {
 			var widget = $(this).data('widget');
 			if (allowed.indexOf(widget) == -1)
@@ -142,6 +142,7 @@ $('#slideTemplate').change(function() {
 		});
 		
 		// show active tab
+		if (valueType == null) valueType = allowed[0];
 		$('#slideEdit a[href="#' + fieldName + '-' + valueType + '"]').tab('show');
 		previewWidget(fieldName);
 	});
@@ -159,13 +160,15 @@ $(document).on('click', '#slideEdit .nav-tabs a', function(e) {
 
 var uploadedDataFor = {}
 var slideEditClosing = false;
-$('#slideEdit').on('hide.bs.modal', function() {
+$('#slideEdit').on('hide.bs.modal', function(e) {
 	if (slideEditClosing) return;
 	slideEditClosing = true;
 	if (editSlide && editSlide.changed) {
 		var yes = confirm("Save changes before closing?");
 		if (!yes) return;
 		$('#slideSave').click();
+		slideEditClosing = false;
+		return e.preventDefault();
 	} else {
 		editSlide = null;
 	}
@@ -194,6 +197,7 @@ function saveWidget(fieldName) {
 
 function previewWidget(fieldName) {
 	var field = editSlide.fieldByName[fieldName];
+	var finfo = templateByID[editSlide.templateID].fieldByName[fieldName].info;
 	var widget = $('#field-' + fieldName + ' .nav-tabs li.active a').data('widget');
 	var preview = $('#preview-' + fieldName);
 	var src = '';
@@ -202,13 +206,13 @@ function previewWidget(fieldName) {
 			src = uploadedDataFor[fieldName];
 		else {
 			// generate an appropriate placeholder image using the desired width/height of the image
-			var finfo = templateByID[editSlide.templateID].fieldByName[fieldName].info;
-			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.width + 'x' + finfo.height;
+			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.w + 'x' + finfo.h;
 		}
 	} else {
 		if (!field.widget) {
 			field.widget = {__type: widget};
 		}
+		field.widget.W = finfo.w; field.widget.H = finfo.h;
 		src = '/widget.aspx/preview?widget=' + encodeURIComponent(JSON.stringify(field.widget));
 	}
 	$(preview).attr('src', src);
@@ -324,9 +328,9 @@ $('#slideDelete').click(function() {
 $('#playerSave').click(function() { playerSave(); });
 
 function playerSave() {
+	$('#slideTable').html('<img src="ajax-loader.gif">');
 	$.post('/api/players/update', JSON.stringify(editPlayer), function(r) {
 		editPlayer = r.result;
-		$('#slideTable').html('<img src="ajax-loader.gif">');
 		setTimeout(refreshPlayer, 1000); // update slide list to show new thumbnail URL
 		playerDirty = false;
 		$('#playerSave').hide();

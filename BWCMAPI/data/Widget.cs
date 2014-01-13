@@ -13,6 +13,7 @@ using System.Drawing.Text;
 namespace BWCMAPI.data {
     public abstract class Widget {
         public int mediaID;
+        public int W, H;
         public static List<Widget> renderList = new List<Widget>();
 
         public string[] types() {
@@ -20,7 +21,7 @@ namespace BWCMAPI.data {
         }
 
         public byte[] render() {
-            Size size = getSize();
+            Size size = new Size(W, H);
             Bitmap image = new Bitmap(size.Width, size.Height);
             Graphics g = Graphics.FromImage(image);
             g.SmoothingMode = SmoothingMode.HighQuality;
@@ -85,7 +86,6 @@ namespace BWCMAPI.data {
         }
 
         abstract protected void render(Graphics g);
-        abstract protected Size getSize();
         abstract protected string key();
         abstract public bool needRefresh();
 
@@ -106,18 +106,21 @@ namespace BWCMAPI.data {
         public WidgetText() { }
 
         protected override void render(Graphics g) {
-            int W = getSize().Width, H = getSize().Height;
             int marginX = 16, marginY = 8;
 
-            g.DrawImage(new Bitmap(Global.appData("1059x94 text.png")), new Rectangle(0, 0, W, H));
+            if (W == 1059 && H == 94) {
+                g.DrawImage(new Bitmap(Global.appData("1059x94 text.png")), new Rectangle(0, 0, W, H));
+            } else if (W == 423 && H == 423) {
+                g.DrawImage(new Bitmap(Global.appData("423x423 text.png")), new Rectangle(0, 0, W, H));
+            } else {
+                Global.error("Drawing WidgetText in unknown frame size: " + W + "x" + H);
+            }
+
             fitText(g, Color.White, "Calibri", text, new RectangleF(marginX, marginY, W - marginX * 2, H - marginY * 2));
         }
 
-        protected override Size getSize() {
-            return new Size(1059, 94);
-        }
         protected override string key() {
-            return "text " + text;
+            return "text " + text + " " + W + "x" + H;
         }
         public override bool needRefresh() {
             return false;
@@ -128,13 +131,9 @@ namespace BWCMAPI.data {
         public string handles;
         public WidgetTwitter() { }
 
-        protected override Size getSize() {
-            return new Size(1059, 94);
-        }
-        
         protected override void render(Graphics g) {
-            int W = getSize().Width, H = getSize().Height;
-
+            if (W != 1059 || H != 94)
+                Global.error("Drawing WidgetTwitter in unknown frame size: " + W + "x" + H);
             g.DrawImage(new Bitmap(Global.appData("1059x94 twitter.png")), new Rectangle(0, 0, W, H));
 
             if (handles == null) return;
@@ -181,7 +180,7 @@ namespace BWCMAPI.data {
         }
 
         protected override string key() {
-            return "twitter " + handles;
+            return "twitter " + handles + " " + W + "x" + H;
         }
         public override bool needRefresh() {
             return true; // todo check time since last refresh
@@ -192,8 +191,8 @@ namespace BWCMAPI.data {
         public WidgetWeather() { }
 
         protected override void render(Graphics g) {
-            int W = getSize().Width, H = getSize().Height;
-
+            if (W != 423 || H != 423)
+                Global.error("Drawing WidgetWeather in unknown frame size: " + W + "x" + H);
             g.DrawImage(new Bitmap(Global.appData("423x423 weather bg.png")), new Rectangle(0, 0, W, H));
 
             string temp = "", cond = "";
@@ -242,12 +241,8 @@ namespace BWCMAPI.data {
             //g.DrawString("Updated at " + DateTime.Now.ToShortTimeString(), cfont, brush, 40, 280);
         }
 
-        protected override Size getSize() {
-            return new Size(423, 423);
-        }
-
         protected override string key() {
-            return "weather"; // singleton
+            return "weather " + W + "x" + H;
         }
         public override bool needRefresh() {
             return true; // todo check time since last refresh
@@ -260,9 +255,6 @@ namespace BWCMAPI.data {
         protected override void render(Graphics g) {
             g.Clear(Color.White);
             Global.error("Why are you rendering a WidgetNone?");
-        }
-        protected override Size getSize() {
-            return new Size(100, 100);
         }
         protected override string key() {
             return "empty";

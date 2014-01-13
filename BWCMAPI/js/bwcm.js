@@ -9,6 +9,7 @@ if (!xhr.upload) {
 
 var loggedOut = false;
 $.ajaxSetup({
+	cache: false,
 	error: function(xhr, textStatus, error) {
 		if (xhr.status == 403) {
 			if (!loggedOut) {
@@ -48,7 +49,7 @@ $('a[data-page]').click(function() {
 }); // window.load
 
 function page(name) {
-	var p = $('.page[data-page="' + name + '"');
+	var p = $('.page[data-page="' + name + '"]');
 	if (!p.length) {
 		alert("unkown page name: " + name);
 		return;

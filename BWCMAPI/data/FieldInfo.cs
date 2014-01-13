@@ -12,9 +12,9 @@ using System.Xml.Linq;
 
 namespace BWCMAPI.data {
     public class FieldInfo {
-        public string name;
-        public string[] widgets;
-        public int width, height;
+        public string n;
+        public string[] ws;
+        public int w, h;
 
         public FieldInfo() { }
     }

@@ -233,7 +233,8 @@ namespace BWCMAPI {
                 items[s].mediaId = slide.id; items[s].mediaIdSpecified = true;
             }
             playlistServ.deleteAllPlaylistItems(player.id, true);
-            playlistServ.addPlaylistItems(player.id, true, items);
+            if (items.Length > 0)
+                playlistServ.addPlaylistItems(player.id, true, items);
 
             // save changes locally
             players.Remove(old);
