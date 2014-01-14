@@ -231,7 +231,7 @@ namespace BWCMAPI.data {
                 if (W == 423)
                     g.DrawImage(b, 250, 70);
                 else
-                    g.DrawImage(b, 120, 50);
+                    g.DrawImage(b, 120, 40);
 
             } catch (Exception e) {
                 Global.d("WX exception: " + e.ToString());
@@ -245,13 +245,13 @@ namespace BWCMAPI.data {
             if (W == 423)
                 g.DrawString(temp, tfont, brush, 40, 240);
             else
-                g.DrawString(temp, tfont, brush, 10, 180);
+                g.DrawString(temp, tfont, brush, 10, 160);
 
             SizeF csize = g.MeasureString(cond, cfont);
             if (W == 423)
                 g.DrawString(cond, cfont, brush, 250 + (128 - csize.Width) / 2, 190);
             else
-                g.DrawString(cond, cfont, brush, 120 + (128 - csize.Width) / 2, 170);
+                g.DrawString(cond, cfont, brush, 120 + (128 - csize.Width) / 2, 150);
         }
 
         protected override string key() {
