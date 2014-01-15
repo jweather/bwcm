@@ -48,6 +48,7 @@ namespace BWCMAPI.data {
         }
 
         public static void saveData() {
+            FileStream fs = null;
             try {
                 lock (sync) {
                     if (!Global.dataDirty) return;
@@ -58,7 +59,7 @@ namespace BWCMAPI.data {
 
                     string path = HostingEnvironment.MapPath("~/App_Data/data.json");
                     string str = Global.json.Serialize(data);
-                    FileStream fs = File.Open(path, FileMode.Truncate);
+                    fs = File.Open(path, FileMode.Truncate);
                     byte[] buffer = Encoding.ASCII.GetBytes(str);
                     fs.Write(buffer, 0, buffer.Length);
                     fs.Close();
@@ -67,6 +68,8 @@ namespace BWCMAPI.data {
                 }
             } catch (Exception e) {
                 Global.error("Failed to persist data.json: " + e);
+            } finally {
+                if (fs != null) try { fs.Close(); } catch { }
             }
         }
     }

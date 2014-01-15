@@ -251,8 +251,13 @@ namespace BWCMAPI {
                 items[s].mediaId = slide.id; items[s].mediaIdSpecified = true;
             }
             playlistServ.deleteAllPlaylistItems(player.id, true);
-            if (items.Length > 0)
-                playlistServ.addPlaylistItems(player.id, true, items);
+            foreach (ScalaWS.Playlist.playlistItemTO item in items) {
+                try {
+                    playlistServ.addPlaylistItem(player.id, true, item);
+                } catch (Exception e) {
+                    Global.d("savePlayer: failed to add item " + item.id + " to playlist " + player.name + ": " + e);
+                }
+            }
 
             // save changes locally
             players.Remove(old);
