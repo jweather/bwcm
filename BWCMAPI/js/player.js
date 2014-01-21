@@ -9,8 +9,6 @@ function refreshPlayerTable() {
 		players = players.sort(function(a,b) {
 			if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; 
 		});
-		for (var i = 0; i < players.length; i++)
-			players[i].name = players[i].name.replace(/@/g, ''); // used to sort them first in the list
 			
 		$('#playerTable').html('');
 		$('#playerTable').json2html(players, playerRow);
