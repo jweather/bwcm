@@ -290,11 +290,19 @@ $('#slideSave').click(function() {
 		var fieldName = $(this).data('name');
 		var field = editSlide.fieldByName[fieldName];
 		
-		if (!field.mediaID && !field.widget) {
-			ok = false;
-			alert("Please assign a value to each field before saving.");
-			return false;
+		if (field.widget.__type == 'image') {
+			if (field.mediaID) return;
+		} else if (field.widget.__type == 'text') {
+			if (field.widget.text) return;
+		} else if (field.widget.__type == 'twitter') {
+			if (field.widget.handles) return;
+		} else { // weather or none
+			return;
 		}
+
+		ok = false;
+		alert("Please assign a value to each field before saving.");
+		return false;
 	});
 	if (!ok) return;
 	
