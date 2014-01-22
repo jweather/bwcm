@@ -233,6 +233,8 @@ $(document).on('change', '#slideEdit input[type=file]', function(e) {
 	var file = files[0];
 	var fieldName = $(e.target).data('name');
 	if (file.type.indexOf("image") == 0) {
+		$('#uploading-' + fieldName).show();
+	
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			var preview = $('#preview-' + fieldName);
@@ -259,6 +261,7 @@ $(document).on('change', '#slideEdit input[type=file]', function(e) {
 				console.log('uploaded new media item with ID ' + r.id + ' for field ' + fieldName);
 				editSlide.fieldByName[fieldName].mediaID = r.id;
 				delete editSlide.uploads[fieldName];
+				$('#uploading-' + fieldName).hide();
 			}
 		}
 		xhr.onerror = function(xhr) {
@@ -359,7 +362,8 @@ var templateField = {tag: 'div', 'class': 'form-group', children: [
 	{tag: 'label', 'for': 'field-${name}', html: '${name}'},
 	{tag: 'div', id: 'field-${name}', 'data-name': '${name}', 'class': 'form-control fieldRow', children: [
 		{tag: 'div', 'class': 'fieldPreview', children: [
-			{tag: 'img', id: 'preview-${name}', 'data-name': '${name}'}]},
+			{tag: 'img', id: 'preview-${name}', 'data-name': '${name}'},
+			{tag: 'div', html: 'Uploading...', 'class': 'uploading', id: 'uploading-${name}'}]},
 		{tag: 'div', 'class': 'fieldValues', children: [
 			{tag: 'ul', 'class': 'nav nav-tabs', children: [
 				{tag: 'li', 'class': 'image', children: 

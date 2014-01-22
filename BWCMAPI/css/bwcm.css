@@ -57,6 +57,16 @@ hidden {
 	clear: both;
 }
 
+.uploading {
+	display: none;
+	position: relative;
+	bottom: 30px;
+	width: 200px;
+	text-align: center;
+	background: #555555;
+	color: #ffffff;
+}
+
 @font-face {
   font-family: 'Glyphicons Halflings';
   src: url('../fonts/glyphicons-halflings-regular.eot');
