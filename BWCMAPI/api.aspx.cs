@@ -89,6 +89,7 @@ namespace BWCMAPI {
                         case "/upload":
                             string player = Request.Headers["X_PLAYER"];
                             string fname = Request.Headers["X_FILENAME"].Replace(@"\", "");
+                            fname = Path.GetFileNameWithoutExtension(fname) + "-" + Guid.NewGuid().ToString() + Path.GetExtension(fname);
                             if (!checkPriv(user, player)) {
                                 audit("403 /upload " + player);
                                 result = HttpStatusCode.Forbidden;
