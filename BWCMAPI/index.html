@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <!-- Bootstrap -->
     <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/datepicker.css" rel="stylesheet" />
+	
     <link href="css/bwcm.css" rel="stylesheet" />
 	
 
@@ -47,10 +49,10 @@
 
 			<table border="0" cellpadding="5">
 				<tr><td><label for="loginUser">User name</label></td>
-					<td><input type="text" id="loginUser"/></td>
+					<td><input type="text" class="form-style" id="loginUser"/></td>
 				</tr>
 				<tr><td><label for="loginPass">Password</label></td>
-					<td><input type="password" id="loginPass"/></td>
+					<td><input type="password" class="form-style" id="loginPass"/></td>
 				</tr>
 			</table>
 			<button id="login" class="btn btn-primary">Login</button>
@@ -95,6 +97,7 @@
 			</table>
 			<button id="userAdd" class="btn btn-info">Add User</button>
 			
+			<!-- userEdit -->
 			<div class="modal fade" id="userEdit"><div class="modal-dialog"><div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -143,6 +146,7 @@
 		
 		<div class="page" data-page="player">
 			<h3 id="playerTitle">Editing player</h3>
+			<button class="btn btn-info slideAdd">Add Slide</button>
 			<table class="table table-bordered" width="60%">
 				<thead>
 					<th>Thumbnail</th>
@@ -153,9 +157,10 @@
 				</tbody>
 			</table>
 			<p>Drag images up or down to organize slides.</p>
-			<button id="slideAdd" class="btn btn-info">Add Slide</button>
+			<button class="btn btn-info slideAdd">Add Slide</button>
 			<button id="playerSave" class="btn btn-primary">Save Changes</button>
 			
+			<!-- slideEdit -->
 			<div class="modal fade" id="slideEdit"><div class="modal-dialog"><div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -169,7 +174,36 @@
 						</div>
 						<div class="form-group">
 							<label for="slideTemplate">Template</label>
-							<select id="slideTemplate" size="3" class="form-control"></select>
+							<select id="slideTemplate" class="form-control"></select>
+						</div>
+						<div class="form-group">
+							<label>Valid Dates/Times (leave blank for no restrictions)</label>
+							<table border="0" width="100%" cellpadding="5">
+								<tr>
+									<td width="15%"><label for="slideStartDate">Start Date</label></td>
+									<td width="35%"><input type="text" class="form-style" id="slideStartDate"/></td>
+									<td width="15%"><label for="slideStopDate">End Date</label></td>
+									<td width="35%"><input type="text" class="form-style" id="slideStopDate"/></td>
+								</tr>
+								<tr>
+									<td><label for="slideStartTime">Start Time</label></td>
+									<td><input type="text" class="form-style" id="slideStartTime"/></td>
+									<td><label for="slideStopTime">End Time</label></td>
+									<td><input type="text" class="form-style" id="slideStopTime"/></td>
+								</tr>
+								<tr>
+									<td><label for="slideDays">Days</label></td>
+									<td colspan="3">
+										<label class="days"><input type="checkbox" name="slideDays" value="sun">Sun</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="mon">Mon</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="tue">Tue</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="wed">Wed</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="thu">Thu</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="fri">Fri</label>
+										<label class="days"><input type="checkbox" name="slideDays" value="sat">Sat</label>
+									</td>
+								</tr>
+							</table>
 						</div>
 						<div id="slideFields"></div>
 					</form>
@@ -185,13 +219,15 @@
     </div><!-- pageContainer -->
     
     
-    <script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="js/jquery.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="js/json2html-0.4.1.js"></script>
     <script src="js/jquery.json2html.js"></script>
-    <script type="text/javascript" src="js/bootstrap.js"></script>
-    <script type="text/javascript" src="js/bwcm.js"></script>
-    <script type="text/javascript" src="js/player.js"></script>
-    <script type="text/javascript" src="js/user.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+
+    <script src="js/bwcm.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/user.js"></script>
   </body>
 </html>

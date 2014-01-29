@@ -176,7 +176,7 @@ namespace BWCMAPI.data {
                 break;
             }
 
-            fitText(g, Color.White, "Calibri", text, new RectangleF(100, 16, 945, 54));
+            fitText(g, Color.Black, "Calibri", text, new RectangleF(100, 16, 945, 54));
         }
 
         protected override string key() {

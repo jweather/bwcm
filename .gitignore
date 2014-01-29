@@ -2,3 +2,4 @@ BWCMAPI/Web.config
 BWCMAPI/upload
 BWCMAPI/BWCM.log
 BWCMAPI/App_Data/*.json
+BWCM.suo

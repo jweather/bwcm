@@ -1,4 +1,4 @@
-﻿var players, editPlayer = null, editSlide = null, editSlideIndex;
+﻿var players, editPlayer = null, editSlide = null, editSlideIndex, slideEditClosing = false;
 var playerDirty = false;
 var templates, templateByID;
 
@@ -71,9 +71,7 @@ $(document).on('click', '#playerTable .edit', function() {
 	}
 });
 
-$(document).on('click', '#slideTable .edit', function() {
-	editSlideIndex = $(this).parents('tr').data('index');
-	editSlide = clone(editPlayer.slides[editSlideIndex]);
+function beginEditSlide() {
 	editSlide.fieldByName = {};
 	for (var j = 0; j < editSlide.fields.length; j++) {
 		editSlide.fieldByName[editSlide.fields[j].name] = editSlide.fields[j];
@@ -83,10 +81,47 @@ $(document).on('click', '#slideTable .edit', function() {
 	$('#slideTemplate').val(editSlide.templateID).change();
 	editSlide.changed = wasDirty; // template change always marks slide dirty
 	
+	if (editSlide.startDate == null) {
+		$('#slideStartDate').datepicker('setValue', '');
+		$('#slideStartDate').val('');
+	} else {
+		$('#slideStartDate').datepicker('setValue', editSlide.startDate);
+	}
+	
+	if (editSlide.stopDate == null) {
+		$('#slideStopDate').datepicker('setValue', '');
+		$('#slideStopDate').val('');
+	} else {
+		$('#slideStopDate').datepicker('setValue', editSlide.stopDate);
+	}
+	$('#slideStartTime').val(editSlide.startTime == '0:00' ? '' : editSlide.startTime);
+	$('#slideStopTime').val(editSlide.stopTime == '24:00' ? '' : editSlide.stopTime);
+	
+	$('.days :checkbox').each(function() {
+		$(this).prop('checked', editSlide.days == null || editSlide.days.indexOf($(this).val()) != -1);
+	});
+	
 	$('#slideEdit').modal();
+}
+
+$(document).on('click', '#slideTable .edit', function() {
+	editSlideIndex = $(this).parents('tr').data('index');
+	editSlide = clone(editPlayer.slides[editSlideIndex]);
+
+	beginEditSlide();
 });
 
-$('#slideAdd').click(function() {
+$(document).on('click', '#slideTable .copy', function() {
+	editSlideIndex = $(this).parents('tr').data('index');
+	editSlide = clone(editPlayer.slides[editSlideIndex]);
+	editSlideIndex = -1; // save as new slide
+	delete editSlide.id;
+	editSlide.changed = true;
+
+	beginEditSlide();
+});
+
+$('.slideAdd').click(function() {
 	editSlide = {__type: 'slide', fields: [], fieldByName: {}};
 	editSlideIndex = -1;
 	$('#slideName').val('New Slide');
@@ -96,7 +131,15 @@ $('#slideAdd').click(function() {
 	editSlide.changed = true;
 });
 
-$(document).on('input', '#slideName', function() {
+$(document).on('input', '#slideName,#slideStartDate,#slideStopDate,#slideStartTime,#slideStopTime', function() {
+	editSlide.changed = true;
+});
+
+$('#slideStartDate,#slideStopDate').datepicker().on('changeDate', function() {
+	editSlide.changed = true;
+});
+
+$('.days :checkbox').click(function() {
 	editSlide.changed = true;
 });
 
@@ -165,8 +208,8 @@ $(document).on('click', '#slideEdit .nav-tabs a', function(e) {
 });
 
 var uploadedDataFor = {}
-var slideEditClosing = false;
 $('#slideEdit').on('hide.bs.modal', function(e) {
+	if (e.target != this) return; // datepicker is throwing hide events too
 	if (slideEditClosing) return;
 	slideEditClosing = true;
 	if (editSlide && editSlide.changed) {
@@ -272,6 +315,31 @@ $(document).on('change', '#slideEdit input[type=file]', function(e) {
 	}
 });
 
+function validate(val) {
+	if (!val) return null;
+	val = val.trim();
+	if (val == '') return null;
+	var matches = val.match(/\d{1,2}\/\d{1,2}(\/\d{2,4})?/);
+	if (matches == null || val != matches[0]) return false;
+	if (matches[1] == undefined) 
+		return val + '/' + new Date().getFullYear();
+	return val;
+}
+
+function valitime(val) {
+	val = val.trim();
+	if (val == '') return null;
+	var matches = val.match(/(\d{1,2})(:\d\d)? ?(am|pm|AM|PM)?/);
+	if (matches == null || val != matches[0]) return false;
+	var h = parseInt(matches[1],10);
+	if (matches[3] && matches[3].toLowerCase() == 'pm')
+		h += 12;
+	if (h < 1 || h > 23) return false;
+	var m = matches[2] ? parseInt(matches[2].slice(1),10) : 0;
+	if (m > 59) return false;
+	return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
+}
+
 $('#slideSave').click(function() {
 	if ($('#slideTemplate').val() == null) {
 		alert("Please select a template and assign fields before saving.");
@@ -284,6 +352,22 @@ $('#slideSave').click(function() {
 			return;
 		}
 	}
+	
+	editSlide.startDate = validate($('#slideStartDate').val());
+	editSlide.stopDate = validate($('#slideStopDate').val());
+	if (editSlide.startDate == false || editSlide.stopDate == false) {
+		alert("Please enter dates like 03/22/2004.");
+		return;
+	}
+	
+	editSlide.startTime = valitime($('#slideStartTime').val());
+	editSlide.stopTime = valitime($('#slideStopTime').val());
+	if (editSlide.startTime == false || editSlide.stopTime == false) {
+		alert("Please enter times like 13:00 or 1:00 pm");
+		return;
+	}
+	
+	editSlide.days = $('.days :checkbox:checked').map(function() { return $(this).val(); }).toArray();
 	
 	var ok = true;
 	$('#slideFields .fieldRow').each(function() {
@@ -307,7 +391,6 @@ $('#slideSave').click(function() {
 	if (!ok) return;
 	
 	editSlide.name = $('#slideName').val();
-	// fields have already been set
 	
 	// commit changes to local structure
 	if (editSlideIndex == -1) {
@@ -357,11 +440,29 @@ var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
   {tag: 'td', html: '<button class="btn btn-primary edit">Edit</button>'}
 ]};
 
+function titleCase(str) {
+	if (!str || str.length == 0) return '';
+	if (str.length == 1) return str.toUpperCase();
+	return str.substr(0, 1).toUpperCase() + str.substr(1).toLowerCase();
+}
+
 var slideRow = {tag: 'tr', 'data-index': '${index}', children: [
   {tag: 'td', width: 244, children: [
 	{tag: 'img', 'class': 'slideThumb', src: '/thumbnail.aspx?id=${id}'}]},
-  {tag: 'td', html: '${name}'},
-  {tag: 'td', html: '<button class="btn btn-primary edit">Edit</button>'}
+  {tag: 'td', html: function() {
+	var lines = ['<b>' + this.name + '</b>'];
+	if (this.startDate) lines.push('Starting on ' + this.startDate);
+	if (this.stopDate) lines.push('Ending on ' + this.stopDate);
+	if (this.startTime) lines.push('From ' + this.startTime + ' to ' + this.stopTime);
+	if (this.days && this.days.length < 7) {
+		lines.push('On ' + this.days.map(function(d) { return titleCase(d); }).join(', '));
+	}
+	return lines.join('<br>');
+	}},
+  {tag: 'td', children: [
+	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'},
+	{tag: 'button', 'class': 'btn copy', html: 'Copy'}
+	]}
 ]};
 
 var templateOption = {tag: 'option', 'value': '${id}', html: '${name}'};

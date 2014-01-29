@@ -93,11 +93,32 @@ namespace BWCMAPI {
                         try {
                             // if (item.playlistItemType != playlistItemTypeEnum.MESSAGE) continue; // not supported by ScalaWS, hopefully no non-message items show up in this playlist
                             // item.mediaID is the message ID, item.id is the playlistItemID
+                            if (item.mediaId == 0) continue; // sub-playlist?
+
                             messageTO message = messageServ.get(item.mediaId, true);
                             Slide slide = new Slide(item.mediaId, message.name);
                             player.slides.Add(slide);
 
                             slide.templateID = message.templateId;
+
+                            if (item.useValidRange) {
+                                slide.startDate = item.startValidDate.ToShortDateString();
+                                if (slide.startDate == "1/1/0001") slide.startDate = null;
+                                slide.stopDate = item.endValidDate.ToShortDateString();
+                                if (slide.stopDate == "1/1/0001") slide.stopDate = null;
+                            }
+
+                            timeScheduleTO[] times = playlistServ.getTimeSchedules(item.id, true);
+                            if (times.Length > 0) {
+                                slide.startTime = times[0].startTime;
+                                if (slide.startTime == "0:00") slide.startTime = null;
+                                slide.stopTime = times[0].endTime;
+                                if (slide.stopTime == "24:00") slide.stopTime = null;
+                                slide.days = new List<string>();
+                                foreach (weekdayEnum day in times[0].days) {
+                                    slide.days.Add(day.ToString().Substring(0,3).ToLower());
+                                }
+                            }
 
                             messageDataFieldTO[] fields = messageServ.getFiles(item.mediaId, true);
                             List<string> foundFields = new List<string>();
@@ -245,15 +266,39 @@ namespace BWCMAPI {
 
             // reorder messages in playlist
             ScalaWS.Playlist.playlistItemTO[] items = new ScalaWS.Playlist.playlistItemTO[player.slides.Count];
+            Dictionary<int, timeScheduleTO> schedules = new Dictionary<int, timeScheduleTO>();
             for (int s=0; s < player.slides.Count; s++) {
                 Slide slide = player.slides[s];
                 items[s] = new ScalaWS.Playlist.playlistItemTO();
                 items[s].mediaId = slide.id; items[s].mediaIdSpecified = true;
+
+                if (slide.startDate != null || slide.stopDate != null) {
+                    items[s].useValidRange = true; items[s].useValidRangeSpecified = true;
+                    if (slide.startDate != null) {
+                        items[s].startValidDate = DateTime.Parse(slide.startDate); items[s].startValidDateSpecified = true;
+                    }
+                    if (slide.stopDate != null) {
+                        items[s].endValidDate = DateTime.Parse(slide.stopDate); items[s].endValidDateSpecified = true;
+                    }
+                }
+
+                if (slide.startTime != null || slide.stopTime != null || (slide.days != null && slide.days.Count < 7)) {
+                    if (slide.startTime == null) slide.startTime = "0:00";
+                    if (slide.stopTime == null) slide.stopTime = "24:00"; // no, it doesn't make sense
+                    timeScheduleTO sched = new timeScheduleTO();
+                    sched.startTime = slide.startTime;
+                    sched.endTime = slide.stopTime;
+                    sched.days = slide.scalaDays();
+                    schedules.Add(slide.id, sched);
+                }
             }
             playlistServ.deleteAllPlaylistItems(player.id, true);
             foreach (ScalaWS.Playlist.playlistItemTO item in items) {
                 try {
-                    playlistServ.addPlaylistItem(player.id, true, item);
+                    ScalaWS.Playlist.playlistItemTO playlistItem = playlistServ.addPlaylistItem(player.id, true, item);
+                    if (schedules.ContainsKey(item.mediaId)) {
+                        playlistServ.addTimeSchedule(playlistItem.id, true, schedules[item.mediaId]);
+                    }
                 } catch (Exception e) {
                     Global.d("savePlayer: failed to add item " + item.id + " to playlist " + player.name + ": " + e);
                 }
