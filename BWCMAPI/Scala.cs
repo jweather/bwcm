@@ -451,7 +451,7 @@ namespace BWCMAPI {
             do {
                 messages = messageServ.list(mcrit, mlcrit);
                 Global.d("got chunk with " + messages.Length + " messages");
-                mlcrit.maxResults += messages.Length;
+                mlcrit.firstResult += messages.Length;
                 foreach (messageTO m in messages) allmessages.Add(m);
             } while (messages.Length == chunk);
             Global.d("total " + allmessages.Count + " messages received");
