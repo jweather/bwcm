@@ -283,8 +283,8 @@ namespace BWCMAPI {
                 }
 
                 if (slide.startTime != null || slide.stopTime != null || (slide.days != null && slide.days.Count < 7)) {
-                    if (slide.startTime == null) slide.startTime = "0:00";
-                    if (slide.stopTime == null) slide.stopTime = "24:00"; // no, it doesn't make sense
+                    if (slide.startTime == null) slide.startTime = "0:00:00";
+                    if (slide.stopTime == null) slide.stopTime = "24:00:00"; // no, it doesn't make sense
                     timeScheduleTO sched = new timeScheduleTO();
                     sched.startTime = slide.startTime;
                     sched.endTime = slide.stopTime;
