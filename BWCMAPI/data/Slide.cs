@@ -32,6 +32,8 @@ namespace BWCMAPI.data {
         public Slide() { this.id = -1;  }
 
         public weekdayEnum?[] scalaDays() {
+            this.days = new List<string>() { "sun", "mon", "tue", "wed", "thu", "fri", "sat" }; // override, don't allow editing days
+
             List<weekdayEnum?> scala = new List<weekdayEnum?>();
             foreach (string day in days) {
                 switch (day) {

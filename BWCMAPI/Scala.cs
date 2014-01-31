@@ -111,7 +111,7 @@ namespace BWCMAPI {
                             timeScheduleTO[] times = playlistServ.getTimeSchedules(item.id, true);
                             if (times.Length > 0) {
                                 slide.startTime = times[0].startTime;
-                                if (slide.startTime == "0:00") slide.startTime = null;
+                                if (slide.startTime == "0:00" || slide.startTime == "00:00") slide.startTime = null;
                                 slide.stopTime = times[0].endTime;
                                 if (slide.stopTime == "24:00") slide.stopTime = null;
                                 slide.days = new List<string>();
@@ -283,8 +283,8 @@ namespace BWCMAPI {
                 }
 
                 if (slide.startTime != null || slide.stopTime != null || (slide.days != null && slide.days.Count < 7)) {
-                    if (slide.startTime == null) slide.startTime = "0:00:00";
-                    if (slide.stopTime == null) slide.stopTime = "24:00:00"; // no, it doesn't make sense
+                    if (slide.startTime == null) slide.startTime = "00:00";
+                    if (slide.stopTime == null) slide.stopTime = "24:00"; // no, it doesn't make sense
                     timeScheduleTO sched = new timeScheduleTO();
                     sched.startTime = slide.startTime;
                     sched.endTime = slide.stopTime;
@@ -452,7 +452,7 @@ namespace BWCMAPI {
                 messages = messageServ.list(mcrit, mlcrit);
                 Global.d("got chunk with " + messages.Length + " messages");
                 mlcrit.firstResult += messages.Length;
-                foreach (messageTO m in messages) allmessages.Add(m);
+                allmessages.Concat<messageTO>(messages);
             } while (messages.Length == chunk);
             Global.d("total " + allmessages.Count + " messages received");
         }
