@@ -29,6 +29,7 @@ namespace BWCMAPI {
                     case "/refresh":
                         // intended to be called every 5 minutes to refresh widgets and update images
                         //Scala.garbageCollection();
+                        Scala.queryTest();
 
                         int count = 0;
                         List<Widget> removeList = new List<Widget>();

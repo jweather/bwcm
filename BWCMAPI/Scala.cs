@@ -432,6 +432,29 @@ namespace BWCMAPI {
             if (referencedMedia == null) return true;
             return referencedMedia.Contains(p);
         }
+
+        public static void queryTest() {
+            // list all BWCM messages
+            ScalaWS.Message.searchCriteriaTO[] mcrit = new ScalaWS.Message.searchCriteriaTO[1]; mcrit[0] = new ScalaWS.Message.searchCriteriaTO();
+            mcrit[0].column = "categoryId"; mcrit[0].value = managedCatID.ToString();
+            mcrit[0].restriction = ScalaWS.Message.restrictionEnum.EQUALS; mcrit[0].restrictionSpecified = true;
+            messageTO[] messages = messageServ.list(mcrit, null);
+
+            Global.d("retrieved " + messages.Length + " messages in one request");
+
+            ScalaWS.Message.listResultCriteriaTO mlcrit = new ScalaWS.Message.listResultCriteriaTO();
+            mlcrit.firstResult = 0; mlcrit.firstResultSpecified = true;
+            const int chunk = 20;
+            mlcrit.maxResults = chunk; mlcrit.maxResultsSpecified = true;
+            List<messageTO> allmessages = new List<messageTO>();
+            messages = new messageTO[0];
+            do {
+                messages = messageServ.list(mcrit, mlcrit);
+                Global.d("got chunk with " + messages.Length + " messages");
+                foreach (messageTO m in messages) allmessages.Add(m);
+            } while (messages.Length == chunk);
+            Global.d("total " + allmessages.Count + " messages received");
+        }
     }
 
     class ThumbCache {
