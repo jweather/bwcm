@@ -116,7 +116,7 @@ namespace BWCMAPI.data {
                 Global.error("Drawing WidgetText in unknown frame size: " + W + "x" + H);
             }
 
-            fitText(g, Color.White, "Calibri", text, new RectangleF(marginX, marginY, W - marginX * 2, H - marginY * 2));
+            fitText(g, Color.Black, "Calibri", text, new RectangleF(marginX, marginY, W - marginX * 2, H - marginY * 2));
         }
 
         protected override string key() {
