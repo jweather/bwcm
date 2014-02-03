@@ -335,7 +335,10 @@ function valitime(val) {
 	if (matches[3] && matches[3].toLowerCase() == 'pm') {
 		if (h < 12)	h += 12;
 	}
-	if (h < 1 || h > 23) return false;
+	if (matches[3] && matches[3].toLowerCase() == 'am') {
+		if (h == 12) h = 0;
+	}
+	if (h < 0 || h > 23) return false;
 	var m = matches[2] ? parseInt(matches[2].slice(1),10) : 0;
 	if (m > 59) return false;
 	return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
