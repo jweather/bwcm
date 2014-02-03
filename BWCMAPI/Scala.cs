@@ -363,7 +363,11 @@ namespace BWCMAPI {
             approval.user = "administrator";
             approval.editTimestamp = DateTime.Now;
             approval.editTimestampSpecified = true;
-            mediaServ.updateApproval(id, true, approval);
+            try {
+                mediaServ.updateApproval(id, true, approval);
+            } catch {
+                // throws exceptions if media is already approved -- wtf, Scala?
+            }
         }
 
         private static long FileInfo(string localFile) {
