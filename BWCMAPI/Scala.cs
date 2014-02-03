@@ -258,7 +258,11 @@ namespace BWCMAPI {
 
             foreach (int id in oldIDs) {
                 // deleted or replaced
-                messageServ.delete(id, true);
+                try {
+                    messageServ.delete(id, true);
+                } catch (Exception e) {
+                    Global.d("Failed to delete slide " + id + ": " + e.Message);
+                }
                 thumbCache.Remove(id);
                 if (!replaced.Contains(id))
                     summary += " -- deleted slide " + id;

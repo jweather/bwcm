@@ -29,25 +29,24 @@ namespace BWCMAPI {
                     case "/refresh":
                         // intended to be called every 5 minutes to refresh widgets and update images
                         Scala.garbageCollection();
-                        //Scala.queryTest();
 
                         int count = 0;
+                        List<Widget> list = new List<Widget>(Widget.renderList);
                         List<Widget> removeList = new List<Widget>();
-                        foreach (Widget wi in Widget.renderList) {
+                        bool removed = false;
+                        foreach (Widget wi in list) {
                             if (!Scala.mediaReferenced(wi.mediaID)) {
-                                removeList.Add(wi);
+                                Global.d("expiring non-referenced widget " + wi.mediaID + ": " + wi.GetType().ToString());
+                                Widget.renderList.Remove(wi);
+                                removed = true;
                             } else if (wi.needRefresh() || q["all"] != null) {
                                 count++;
                                 wi.refresh(); // render and upload new version
                             }
                         }
-                        if (removeList.Count > 0) {
-                            foreach (Widget wi in removeList) {
-                                Global.d("expiring non-referenced widget " + wi.mediaID + ": " + wi.GetType().ToString());
-                                Widget.renderList.Remove(wi);
-                            }
+                        if (removed)
                             Global.dataDirty = true;
-                        }
+
                         response.Add("count", count);
                         break;
 
