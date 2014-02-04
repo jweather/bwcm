@@ -18,7 +18,8 @@ $.ajaxSetup({
 				window.location.href = '/index.html';
 			}
 		} else {
-			alert("Server error: " + textStatus + ": " + error);
+			if (!loggedOut)
+				alert("Server error: " + textStatus + ": " + error);
 		}
 	}
 });
