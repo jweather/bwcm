@@ -108,6 +108,7 @@ namespace BWCMAPI {
                                 if (slide.stopDate == "1/1/0001") slide.stopDate = null;
                             }
 
+                            /* // time range is disabled
                             timeScheduleTO[] times = playlistServ.getTimeSchedules(item.id, true);
                             if (times.Length > 0) {
                                 slide.startTime = times[0].startTime;
@@ -119,6 +120,7 @@ namespace BWCMAPI {
                                     slide.days.Add(day.ToString().Substring(0,3).ToLower());
                                 }
                             }
+                            */
 
                             messageDataFieldTO[] fields = messageServ.getFiles(item.mediaId, true);
                             List<string> foundFields = new List<string>();
@@ -286,6 +288,7 @@ namespace BWCMAPI {
                     }
                 }
 
+                /* // time range is disabled
                 if (slide.startTime != null || slide.stopTime != null || (slide.days != null && slide.days.Count < 7)) {
                     if (slide.startTime == null) slide.startTime = "00:00";
                     if (slide.stopTime == null) slide.stopTime = "24:00"; // no, it doesn't make sense
@@ -295,6 +298,7 @@ namespace BWCMAPI {
                     sched.days = slide.scalaDays();
                     schedules.Add(slide.id, sched);
                 }
+                */
             }
             playlistServ.deleteAllPlaylistItems(player.id, true);
             foreach (ScalaWS.Playlist.playlistItemTO item in items) {

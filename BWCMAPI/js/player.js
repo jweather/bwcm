@@ -364,14 +364,16 @@ $('#slideSave').click(function() {
 		return;
 	}
 	
-	editSlide.startTime = valitime($('#slideStartTime').val());
-	editSlide.stopTime = valitime($('#slideStopTime').val());
+	// time range is disabled
+	editSlide.startTime = null; //valitime($('#slideStartTime').val());
+	editSlide.stopTime = null; //valitime($('#slideStopTime').val());
 	if (editSlide.startTime == false || editSlide.stopTime == false) {
 		alert("Please enter times like 13:00 or 1:00 pm");
 		return;
 	}
 	
-	editSlide.days = $('.days :checkbox:checked').map(function() { return $(this).val(); }).toArray();
+	// days are disabled
+	//editSlide.days = $('.days :checkbox:checked').map(function() { return $(this).val(); }).toArray();
 	
 	var ok = true;
 	$('#slideFields .fieldRow').each(function() {
