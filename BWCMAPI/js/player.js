@@ -528,8 +528,8 @@ function playerSave() {
 var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
   {tag: 'td', html: '${name}'},
   {tag: 'td', children: [
-	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'},
-	{tag: 'button', 'class': 'btn settings', html: 'Settings'}
+	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'} /*,
+	{tag: 'button', 'class': 'btn settings', html: 'Settings'} */
   ]}
 ]};
 
