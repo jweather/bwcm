@@ -86,6 +86,7 @@
       <DependentUpon>api.aspx</DependentUpon>
     </Compile>
     <Compile Include="data\FieldInfo.cs" />
+    <Compile Include="data\PlayerInfo.cs" />
     <Compile Include="data\TemplateInfo.cs" />
     <Compile Include="thumbnail.aspx.cs">
       <DependentUpon>thumbnail.aspx</DependentUpon>

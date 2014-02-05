@@ -144,6 +144,22 @@
 			</table>
 		</div>
 		
+		<div class="page" data-page="playerInfo">
+			<h3 id="playerInfoName">Player Settings</h3>
+			<table class="table table-bordered" width="60%">
+				<tr><td width="20%">Default Slide Time (sec.)</td>
+					<td width="40%"><input type="text" id="playerInfoTime" class="form-control"/></td>
+					<td width="20%"><button id="playerInfoNukeTime" class="btn btn-danger">Apply to ALL Slides</button></td>
+					</tr>
+				<tr><td>Default Twitter Handles</td>
+					<td><input type="text" id="playerInfoTwitter" class="form-control"/></td>
+					<td><button id="playerInfoNukeTwitter" class="btn btn-danger">Apply to ALL Slides</button></td>
+					</tr>
+			</table>
+			<button id="playerInfoSave" class="btn btn-primary">Save Changes</button>
+		</div>
+					
+		
 		<div class="page" data-page="player">
 			<h3 id="playerTitle">Editing player</h3>
 			<button class="btn btn-info slideAdd">Add Slide</button>
@@ -180,9 +196,9 @@
 							<label>Valid Dates/Times (leave blank for no restrictions)</label>
 							<table border="0" width="100%" cellpadding="5">
 								<tr>
-									<td width="15%"><label for="slideStartDate">Start Date</label></td>
+									<td width="15%"><label for="slideStartDate">First Day</label></td>
 									<td width="35%"><input type="text" class="form-style" id="slideStartDate"/></td>
-									<td width="15%"><label for="slideStopDate">End Date</label></td>
+									<td width="15%"><label for="slideStopDate">Last Day</label></td>
 									<td width="35%"><input type="text" class="form-style" id="slideStopDate"/></td>
 								</tr>
 								<tr style="display:none;"> <!-- don't allow editing time range -->
@@ -202,6 +218,10 @@
 										<label class="days"><input type="checkbox" name="slideDays" value="fri">Fri</label>
 										<label class="days"><input type="checkbox" name="slideDays" value="sat">Sat</label>
 									</td>
+								</tr>
+								<tr>
+									<td><label for="slideDuration">Slide Time (sec.)</label></td>
+									<td colspan="3"><input type="text" class="form-style" id="slideDuration"></td>
 								</tr>
 							</table>
 						</div>

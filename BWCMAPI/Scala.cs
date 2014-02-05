@@ -75,6 +75,12 @@ namespace BWCMAPI {
                             field.templateFieldID = fieldTO.id;
                             template.fields.Add(field);
                         }
+
+                        fields = templateServ.getFields(template.id, true);
+                        foreach (templateDataFieldTO fieldTO in fields) {
+                            if (fieldTO.name == "SlideTime")
+                                template.durationFieldID = fieldTO.id;
+                        }
                         template.sortFields();
                         templates.Add(template);
                     } catch (Exception e) {
@@ -88,6 +94,7 @@ namespace BWCMAPI {
                 foreach (playlistTO playlist in playlists) {
                     Player player = new Player(playlist.id, playlist.name);
                     players.Add(player);
+                    
                     ScalaWS.Playlist.playlistItemTO[] items = playlistServ.getPlaylistItems(playlist.id, true);
                     foreach (ScalaWS.Playlist.playlistItemTO item in items) {
                         try {
@@ -135,6 +142,14 @@ namespace BWCMAPI {
                                 slide.fields.Add(field);
                                 foundFields.Add(fieldTO.name);
                             }
+
+                            fields = messageServ.getFields(item.mediaId, true);
+                            foreach (messageDataFieldTO fieldTO in fields) {
+                                if (fieldTO.name == "SlideTime")
+                                    try { slide.duration = Convert.ToInt32(fieldTO.value); } catch {}
+                            }
+                            if (slide.duration == 0)
+                                slide.duration = player.info.defaultDuration;
 
                             // missing fields = WidgetNone
                             Template t = templates.Find(Template.byID(slide.templateID));
@@ -238,7 +253,21 @@ namespace BWCMAPI {
                     if (field.widget != null && !(field.widget is WidgetImage))
                         field.mediaID = field.widget.upload();
 
+                    if (field.widget is WidgetTwitter && player.info.defaultTwitter == "") {
+                        // update default twitter handle
+                        WidgetTwitter wt = (WidgetTwitter)field.widget;
+                        player.info.defaultTwitter = wt.handles;
+                        Global.dataDirty = true;
+                    }
+
                     fieldTO.value = field.mediaID.ToString();
+                    fields.Add(fieldTO);
+                }
+
+                if (template.durationFieldID > 0) {
+                    messageDataFieldTO fieldTO = new messageDataFieldTO();
+                    fieldTO.id = template.durationFieldID; fieldTO.name = "SlideTime";
+                    fieldTO.value = slide.duration.ToString();
                     fields.Add(fieldTO);
                 }
                 
@@ -315,6 +344,11 @@ namespace BWCMAPI {
             // save changes locally
             players.Remove(old);
             players.Add(player);
+
+            if (old.info != player.info) {
+                summary += " -- updated settings";
+                Global.dataDirty = true;
+            }
 
             if (summary == "") summary = " -- reordered slides";
             return summary;

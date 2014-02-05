@@ -16,12 +16,23 @@ namespace BWCMAPI.data {
         // corresponds to a Scala playlist
         public string name;
         public int id;
+        public PlayerInfo info;
+
+        // only used when loading players
+        public static Dictionary<string, PlayerInfo> playerInfo;
 
         public List<Slide> slides = new List<Slide>();
 
         public Player(int id, string name) {
             this.id = id;
             this.name = name;
+            if (playerInfo != null && playerInfo.ContainsKey(name))
+                info = playerInfo[name];
+            else {
+                info = new PlayerInfo();
+                info.defaultDuration = 15;
+                info.defaultTwitter = "";
+            }
         }
 
         public Player() { }

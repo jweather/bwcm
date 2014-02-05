@@ -44,6 +44,15 @@ namespace BWCMAPI.data {
                     Widget.renderList.Add(w);
                 }
             }
+
+            if (data.ContainsKey("players")) {
+                Dictionary<string, Object> pinfo = (Dictionary<string, Object>)data["players"];
+                Player.playerInfo = new Dictionary<string, PlayerInfo>();
+                foreach (string key in pinfo.Keys) {
+                    Player.playerInfo[key] = (PlayerInfo)pinfo[key];
+                }
+            }
+
             Global.d("loaded " + BUser.users.Count + " users and " + Widget.renderList.Count + " widgets from data.json");
         }
 
@@ -56,6 +65,10 @@ namespace BWCMAPI.data {
                     Dictionary<string, Object> data = new Dictionary<string, object>();
                     data.Add("users", BUser.users);
                     data.Add("widgets", Widget.renderList);
+                    Dictionary<string, PlayerInfo> pinfo = new Dictionary<string, PlayerInfo>();
+                    foreach (Player p in Scala.players)
+                        pinfo.Add(p.name, p.info);
+                    data.Add("players", pinfo);
 
                     string path = HostingEnvironment.MapPath("~/App_Data/data.json");
                     string str = Global.json.Serialize(data);

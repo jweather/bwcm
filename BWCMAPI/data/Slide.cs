@@ -20,6 +20,7 @@ namespace BWCMAPI.data {
         public int templateID;
         public bool changed = false;
         public List<Field> fields = new List<Field>();
+        public int duration;
 
         public string startDate, stopDate;
         public string startTime, stopTime;

@@ -31,6 +31,7 @@ namespace BWCMAPI.data {
             types.Add("weather", typeof(WidgetWeather));
             types.Add("templateinfo", typeof(TemplateInfo));
             types.Add("fieldinfo", typeof(FieldInfo));
+            types.Add("playerinfo", typeof(PlayerInfo));
             foreach (String key in types.Keys) {
                 typekeys.Add(types[key], key);
             }

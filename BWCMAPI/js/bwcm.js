@@ -49,7 +49,7 @@ $('a[data-page]').click(function() {
 
 }); // window.load
 
-function page(name) {
+function page(name, quiet) {
 	var p = $('.page[data-page="' + name + '"]');
 	if (!p.length) {
 		alert("unkown page name: " + name);
@@ -63,6 +63,8 @@ function page(name) {
 	// li highlight
 	$('a[data-page]').parents('li').removeClass('active');
 	$('a[data-page="' + name + '"]').parents('li').addClass('active');
+	
+	if (quiet) return;
 	
 	switch (name) {
 		case 'login':

@@ -44,7 +44,7 @@ hidden {
 }
 
 .fieldPreview img {
-	height: 115px;
+	max-height: 115px;
 	max-width: 200px;
 }
 

@@ -18,6 +18,7 @@ namespace BWCMAPI.data {
         public string name;
         public List<Field> fields = new List<Field>();
         public TemplateInfo info;
+        public int durationFieldID;
 
         public Template(int id, string name) {
             this.id = id;

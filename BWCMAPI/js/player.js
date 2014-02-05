@@ -9,6 +9,10 @@ function refreshPlayerTable() {
 		players = players.sort(function(a,b) {
 			if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; 
 		});
+		players.id = {};
+		for (var i = 0; i < players.length; i++) {
+			players.id[players[i].id] = players[i];
+		}
 			
 		$('#playerTable').html('');
 		$('#playerTable').json2html(players, playerRow);
@@ -62,13 +66,78 @@ $(window).load(function() {
 
 $(document).on('click', '#playerTable .edit', function() {
 	var id = $(this).parents('tr').data('id');
-	for (var i = 0; i < players.length; i++) {
-		if (players[i].id == id) {
-			editPlayer = players[i];
-			page('player');
-			$('#playerSave').hide();
+	editPlayer = players.id[id];
+	page('player');
+	$('#playerSave').hide();
+});
+
+$(document).on('click', '#playerTable .settings', function() {
+	var id = $(this).parents('tr').data('id');
+	editPlayer = players.id[id];
+	$('#playerInfoName').text('Settings for ' + editPlayer.name);
+	$('#playerInfoTime').val(editPlayer.info.defaultDuration);
+	$('#playerInfoTwitter').val(editPlayer.info.defaultTwitter);
+	page('playerInfo');
+});
+
+$('#playerInfoSave').click(function() {
+	$('#playerInfoSave').text('Saving...');
+	var time = parseInt($('#playerInfoTime').val(), 10);
+	if (!time) {
+		alert('Please enter a number larger than 0 for the default slide time');
+		return;
+	}
+	editPlayer.info.defaultDuration = time;
+	editPlayer.info.defaultTwitter = $('#playerInfoTwitter').val();
+	
+	$.post('/api/players/update', JSON.stringify(editPlayer), function(r) {
+		editPlayer = r.result;
+		page('players');
+		$('#playerInfoSave').text('Save Changes');
+	}).fail(function(r) {
+		console.log(r);
+	});
+});
+
+$('#playerInfoNukeTime').click(function() {
+	var time = parseInt($('#playerInfoTime').val(), 10);
+	if (!time) {
+		alert('Please enter a number larger than 0 for the default slide time');
+		return;
+	}
+
+	if (!confirm('Really set duration of ' + time + ' seconds for ALL slides on this player?')) return;
+
+	editPlayer.info.defaultDuration = time;
+	for (var i = 0; i < editPlayer.slides.length; i++) {
+		editPlayer.slides[i].duration = time;
+		editPlayer.slides[i].changed = true;
+	}
+	page('player', true);
+	playerSave();
+});
+
+$('#playerInfoNukeTwitter').click(function() {
+	var handles = $('#playerInfoTwitter').val();
+	if (!handles) {
+		alert('Please enter one or more Twitter handles to use');
+		return;
+	}
+
+	if (!confirm('Really set Twitter handles to ' + handles + ' for ALL slides on this player?')) return;
+	
+	editPlayer.info.defaultTwitter = handles;
+	for (var i = 0; i < editPlayer.slides.length; i++) {
+		var slide = editPlayer.slides[i];
+		for (var f = 0; f < slide.fields.length; f++) {
+			if (slide.fields[f].widget && slide.fields[f].widget.__type == 'twitter') {
+				slide.fields[f].widget.handles = handles;
+				slide.changed = true;
+			}
 		}
 	}
+	page('player', true);
+	playerSave();
 });
 
 function beginEditSlide() {
@@ -96,6 +165,7 @@ function beginEditSlide() {
 	}
 	$('#slideStartTime').val(editSlide.startTime == '0:00' ? '' : editSlide.startTime);
 	$('#slideStopTime').val(editSlide.stopTime == '24:00' ? '' : editSlide.stopTime);
+	$('#slideDuration').val(editSlide.duration || editPlayer.info.defaultDuration);
 	
 	$('.days :checkbox').each(function() {
 		$(this).prop('checked', editSlide.days == null || editSlide.days.indexOf($(this).val()) != -1);
@@ -125,6 +195,8 @@ $('.slideAdd').click(function() {
 	editSlide = {__type: 'slide', fields: [], fieldByName: {}};
 	editSlideIndex = -1;
 	$('#slideName').val('New Slide');
+	$('#slideDuration').val(editPlayer.info.defaultDuration);
+	
 	$('#slideTemplate').val('').change();
 
 	$('#slideEdit').modal();
@@ -183,6 +255,11 @@ $('#slideTemplate').change(function() {
 		} else {
 			valueType = allowed[0];
 			field.widget = {__type: valueType};
+			if (allowed.indexOf('twitter') >= 0 && editPlayer.info.defaultTwitter) {
+				valueType = 'twitter';
+				field.widget = {__type: 'twitter', handles: editPlayer.info.defaultTwitter};
+				$('#' + fieldName + '-twitterValue').val(editPlayer.info.defaultTwitter);
+			}
 		}
 		field.widget.W = tf.info.w; field.widget.H = tf.info.h;
 		
@@ -375,6 +452,13 @@ $('#slideSave').click(function() {
 	// days are disabled
 	//editSlide.days = $('.days :checkbox:checked').map(function() { return $(this).val(); }).toArray();
 	
+	var duration = parseInt($('#slideDuration').val(), 10);
+	if (!duration)
+		return alert('Please enter the slide time as a number of seconds larger than 0');
+	if (duration != editSlide.duration)
+		editSlide.changed = true;
+	editSlide.duration = duration;
+
 	var ok = true;
 	$('#slideFields .fieldRow').each(function() {
 		var fieldName = $(this).data('name');
@@ -443,7 +527,10 @@ function playerSave() {
 // templates
 var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
   {tag: 'td', html: '${name}'},
-  {tag: 'td', html: '<button class="btn btn-primary edit">Edit</button>'}
+  {tag: 'td', children: [
+	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'},
+	{tag: 'button', 'class': 'btn settings', html: 'Settings'}
+  ]}
 ]};
 
 function titleCase(str) {
@@ -463,6 +550,8 @@ var slideRow = {tag: 'tr', 'data-index': '${index}', children: [
 	if (this.days && this.days.length < 7) {
 		lines.push('On ' + this.days.map(function(d) { return titleCase(d); }).join(', '));
 	}
+	if (this.duration != editPlayer.info.defaultDuration)
+		lines.push('Play for ' + this.duration + ' seconds');
 	return lines.join('<br>');
 	}},
   {tag: 'td', children: [
