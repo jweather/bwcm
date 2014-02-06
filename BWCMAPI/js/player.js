@@ -526,10 +526,10 @@ function playerSave() {
 
 // templates
 var playerRow = {tag: 'tr', 'data-id': '${id}', children: [
-  {tag: 'td', html: '${name}'},
-  {tag: 'td', children: [
-	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'} /*,
-	{tag: 'button', 'class': 'btn settings', html: 'Settings'} */
+  {tag: 'td', width: '60%', html: '${name}'},
+  {tag: 'td', width: '40%', children: [
+	{tag: 'button', 'class': 'btn btn-primary edit', html: 'Edit'},
+	{tag: 'button', 'class': 'btn settings', html: 'Edit Default Settings'}
   ]}
 ]};
 
