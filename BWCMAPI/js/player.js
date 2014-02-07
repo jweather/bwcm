@@ -40,7 +40,7 @@ refreshPlayerTable = function refreshPlayerTable() {
 				}
 			}
 		}
-		try { $('#slideTemplate').ddslick('destroy'); } catch {}
+		try { $('#slideTemplate').ddslick('destroy'); } catch (err) {}
 		$('#slideTemplate').html('');
 		$('#slideTemplate').json2html(templates, templateOption);
 		$('#slideTemplate').ddslick({
