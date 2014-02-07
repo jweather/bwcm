@@ -26,6 +26,8 @@ namespace BWCMAPI.data {
             try {
                 string blob = File.ReadAllText(Global.appData(this.name + ".json"));
                 info = Global.json.Deserialize<TemplateInfo>(blob);
+                if (info.name != null && info.name != "")
+                    this.name = info.name;
             } catch (Exception e) {
                 Global.error("Failed to parse TemplateInfo for " + name + ": " + e.Message);
             }

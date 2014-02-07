@@ -2,7 +2,11 @@
 var playerDirty = false;
 var templates, templateByID;
 
-function refreshPlayerTable() {
+var refreshPlayer, refreshPlayerTable;
+
+$(window).load(function() {
+
+refreshPlayerTable = function refreshPlayerTable() {
 	$('#playerTable').html('<img src="ajax-loader.gif">');
 	$.get('/api/players', function(r) {
 		players = r.result;
@@ -20,6 +24,9 @@ function refreshPlayerTable() {
 	$.get('/api/templates', function(r) {
 		templates = r.result;
 		templateByID = {};
+		templates = templates.sort(function(a,b) {
+			if (a.name < b.name) return -1; if (a.name > b.name) return 1; return 0; 
+		});
 		for (var i = 0; i < templates.length; i++) {
 			var t = templates[i];
 			templateByID[templates[i].id] = t;
@@ -35,10 +42,21 @@ function refreshPlayerTable() {
 		}
 		$('#slideTemplate').html('');
 		$('#slideTemplate').json2html(templates, templateOption);
+		$('#slideTemplate').ddslick({
+			width: 532, 
+			imagePosition: 'left', 
+			selectText: 'Select a slide template',
+			onSelected: function (data) {
+				if (editSlide) {
+					editSlide.templateID = data.selectedData.value;
+					templateChanged();
+				}
+			}
+		});
 	});
 }
 
-function refreshPlayer() {
+refreshPlayer = function refreshPlayer() {
 	$('#playerTitle').html('Editing ' + editPlayer.name + ' playlist:');
 	
 	for (var s=0; s < editPlayer.slides.length; s++)
@@ -61,8 +79,6 @@ function refreshPlayer() {
 		}
 	});
 }
-
-$(window).load(function() {
 
 $(document).on('click', '#playerTable .edit', function() {
 	var id = $(this).parents('tr').data('id');
@@ -147,7 +163,8 @@ function beginEditSlide() {
 	}
 	$('#slideName').val(editSlide.name);
 	var wasDirty = editSlide.changed;
-	$('#slideTemplate').val(editSlide.templateID).change();
+	$('#slideTemplate').ddslick('select', {value: editSlide.templateID});
+	templateChanged();
 	editSlide.changed = wasDirty; // template change always marks slide dirty
 	
 	if (editSlide.startDate == null) {
@@ -197,10 +214,12 @@ $('.slideAdd').click(function() {
 	$('#slideName').val('New Slide');
 	$('#slideDuration').val(editPlayer.info.defaultDuration);
 	
-	$('#slideTemplate').val('').change();
+	$('#slideTemplate').ddslick('clear');
+	editSlide.templateID = null;
+	templateChanged();
 
 	$('#slideEdit').modal();
-	editSlide.changed = true;
+	editSlide.changed = false;
 });
 
 $(document).on('input', '#slideName,#slideStartDate,#slideStopDate,#slideStartTime,#slideStopTime', function() {
@@ -215,13 +234,13 @@ $('.days :checkbox').click(function() {
 	editSlide.changed = true;
 });
 
-$('#slideTemplate').change(function() {
+function templateChanged() {
 	editSlide.changed = true;
-	var tid = $('#slideTemplate').val();
-	editSlide.templateID = tid;
+	var tid = editSlide.templateID;
 	var t = templateByID[tid];
 	$('#slideFields').html('');
 	if (tid == null) return;
+	
 	$('#slideFields').json2html(t.fields, templateField);
 	$('#slideFields .fieldRow').each(function() {
 		var fieldName = $(this).data('name');
@@ -268,7 +287,7 @@ $('#slideTemplate').change(function() {
 		$('#slideEdit a[href="#' + fieldName + '-' + valueType + '"]').tab('show');
 		previewWidget(fieldName);
 	});
-});
+}
 
 // change field type
 $(document).on('click', '#slideEdit .nav-tabs a', function(e) {
@@ -422,7 +441,7 @@ function valitime(val) {
 }
 
 $('#slideSave').click(function() {
-	if ($('#slideTemplate').val() == null) {
+	if (editSlide.templateID == null) {
 		alert("Please select a template and assign fields before saving.");
 		return;
 	}
@@ -560,7 +579,8 @@ var slideRow = {tag: 'tr', 'data-index': '${index}', children: [
 	]}
 ]};
 
-var templateOption = {tag: 'option', 'value': '${id}', html: '${name}'};
+var templateOption = {tag: 'option', 'value': '${id}', html: '${name}',
+	'data-imagesrc': '/thumbnail.aspx?id=${id}'};
 
 var templateField = {tag: 'div', 'class': 'form-group', children: [
 	{tag: 'label', 'for': 'field-${name}', html: '${name}'},

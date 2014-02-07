@@ -16,5 +16,6 @@ namespace BWCMAPI.data {
         // template info blob
         public List<FieldInfo> fields;
         public TemplateInfo() { }
+        public string name;
     }
 }
