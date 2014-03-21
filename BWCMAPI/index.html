@@ -43,20 +43,31 @@
 
 	<img src="ajax-loader.gif" id="startupLoader">
     <div id="pageContainer" class="hidden">
-
+	
 		<div class="page" data-page="login">
-			<h3>Please log in:</h3>
+			<table border="0" cellpadding="50">
+				<tr><td width="50%">
+				
+					<h3 style="color: #0871de;">If you would like to create/edit your own content, please log in below</h3>
 
-			<table border="0" cellpadding="5">
-				<tr><td><label for="loginUser">User name</label></td>
-					<td><input type="text" class="form-style" id="loginUser"/></td>
-				</tr>
-				<tr><td><label for="loginPass">Password</label></td>
-					<td><input type="password" class="form-style" id="loginPass"/></td>
-				</tr>
+					<table border="0" cellpadding="5">
+						<tr><td><label for="loginUser">User name</label></td>
+							<td><input type="text" class="form-style" id="loginUser"/></td>
+						</tr>
+						<tr><td><label for="loginPass">Password</label></td>
+							<td><input type="password" class="form-style" id="loginPass"/></td>
+						</tr>
+					</table>
+					<button id="login" class="btn btn-primary">Login</button>
+					<span id="loginError"></span>
+				</td>
+				
+				<td width="50%" style="vertical-align: top;">
+					<h3 style="color: #0871de;">If you would like to share content you have already created with other 
+						player managers on campus, please 
+						<a href="http://www.bw.edu/webapps/signage_request/" style="color: #b98a24;">click here</a></h3>
+				</td></tr>
 			</table>
-			<button id="login" class="btn btn-primary">Login</button>
-			<span id="loginError"></span>
 		</div>
 
 		<div class="page" data-page="crawl">
