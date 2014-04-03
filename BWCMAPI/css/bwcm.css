@@ -96,6 +96,16 @@ hidden {
           transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 
+.thumbEnlarge {
+	cursor: pointer;
+	margin-left: 2px;
+	margin-top: 90px;
+}
+
+#thumbZoom .modal-dialog {
+	width: 720px;
+}
+
 
 @font-face {
   font-family: 'Glyphicons Halflings';

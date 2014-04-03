@@ -63,7 +63,9 @@ refreshPlayer = function refreshPlayer() {
 	for (var s=0; s < editPlayer.slides.length; s++)
 		editPlayer.slides[s].index = s;
 	$('#slideTable').html('');
+	slidesExpired = [];
 	$('#slideTable').json2html(editPlayer.slides, slideRow);
+	$('.deleteExpired').toggle(slidesExpired.length > 0);
 	$('#slideTable').sortable({
 		handle: '.slideThumb',
 		stop: function() {
@@ -209,6 +211,14 @@ $(document).on('click', '#slideTable .copy', function() {
 	beginEditSlide();
 });
 
+$(document).on('click', '#slideTable .thumbEnlarge', function() {
+	var src = $(this).data('src');
+	$('#thumbZoomImg').attr('src', src);
+	$('#thumbZoom').modal();
+});
+
+
+
 $('.slideAdd').click(function() {
 	editSlide = {__type: 'slide', fields: [], fieldByName: {}};
 	editSlideIndex = -1;
@@ -221,6 +231,14 @@ $('.slideAdd').click(function() {
 
 	$('#slideEdit').modal();
 	editSlide.changed = false;
+});
+
+$('.deleteExpired').click(function() {
+	if (!confirm('Really delete ' + slidesExpired.length + ' expired slides?')) return;
+
+	editPlayer.slides = editPlayer.slides.filter(function(s) { return slidesExpired.indexOf(s.id) == -1; });
+	playerDirty = true;
+	playerSave();
 });
 
 $(document).on('input', '#slideName,#slideStartDate,#slideStopDate,#slideStartTime,#slideStopTime', function() {
@@ -559,13 +577,23 @@ function titleCase(str) {
 	return str.substr(0, 1).toUpperCase() + str.substr(1).toLowerCase();
 }
 
+var slidesExpired = [];
 var slideRow = {tag: 'tr', 'data-index': '${index}', children: [
   {tag: 'td', width: 244, children: [
-	{tag: 'img', 'class': 'slideThumb', src: '/thumbnail.aspx?id=${id}'}]},
+	{tag: 'img', 'class': 'slideThumb', src: '/thumbnail.aspx?id=${id}'},
+	{tag: 'img', 'class': 'thumbEnlarge', src: 'mag.png', 'data-src': '/thumbnail.aspx?id=${id}&big=1'}
+	]},
   {tag: 'td', html: function() {
 	var lines = ['<b>' + this.name + '</b>'];
 	if (this.startDate) lines.push('Starting on ' + this.startDate);
-	if (this.stopDate) lines.push('Ending on ' + this.stopDate);
+	if (this.stopDate) {
+		var expired = '';
+		if (new Date(this.stopDate) < new Date()-1000*60*60*24) {
+			expired = ' <font color="red">Expired</font>';
+			slidesExpired.push(this.id);
+		}
+		lines.push('Ending on ' + this.stopDate + expired);
+	}
 	if (this.startTime) lines.push('From ' + this.startTime + ' to ' + this.stopTime);
 	if (this.days && this.days.length < 7) {
 		lines.push('On ' + this.days.map(function(d) { return titleCase(d); }).join(', '));

@@ -51,9 +51,12 @@ namespace BWCMAPI.data {
 
         // render and upload
         public int refresh() {
-            string fname = key() + ".png";
+            string sanitized = key();
             foreach (char c in Path.GetInvalidFileNameChars())
-                fname = fname.Replace(c, '_');
+                sanitized = sanitized.Replace(c, '_');
+            sanitized = sanitized.Replace('.', '_'); // Scala doesn't seem to like dots in the filename
+            if (sanitized.Length > 100) sanitized = sanitized.Substring(0, 100); // max length
+            string fname = sanitized + ".png";
 
             string localFile = Global.cfg("uploadDir") + @"\" + fname;
 

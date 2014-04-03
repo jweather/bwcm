@@ -22,7 +22,12 @@ namespace BWCMAPI {
             byte[] thumbdata;
             try {
                 int mediaID = Convert.ToInt32(q["id"]);
-                thumbdata = Scala.thumbnail(mediaID);
+
+                if (q["big"] == "1") {
+                    thumbdata = Scala.largeThumbnail(mediaID);
+                } else {
+                    thumbdata = Scala.thumbnail(mediaID);
+                }
             } catch {
                 // generate placeholder image
                 if (q["placeholder"] != null) {

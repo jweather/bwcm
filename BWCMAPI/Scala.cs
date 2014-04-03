@@ -23,6 +23,7 @@ using System.IO;
 using System.Diagnostics;
 using ScalaWS.Thumbnail;
 using System.Web.Caching;
+using System.Threading;
 
 namespace BWCMAPI {
     public class Scala {
@@ -36,6 +37,7 @@ namespace BWCMAPI {
         static templateService templateServ = new templateService(Global.cfg("scalaUser"), Global.cfg("scalaPass"), Global.cfg("scalaURL"));
         static messageService messageServ = new messageService(Global.cfg("scalaUser"), Global.cfg("scalaPass"), Global.cfg("scalaURL"));
         static uploadfileService uploadServ = new uploadfileService(Global.cfg("scalaUser"), Global.cfg("scalaPass"), Global.cfg("scalaURL"));
+        static thumbnailService thumbServ = new thumbnailService(Global.cfg("scalaUser"), Global.cfg("scalaPass"), Global.cfg("scalaURL"));
 
         // Scala data
         static int managedCatID;
@@ -194,6 +196,22 @@ namespace BWCMAPI {
             string data = mediaServ.getThumbnailAsPNGBytes(id, true);
             byte[] decode = Convert.FromBase64String(data);
             thumbCache[id] = decode;
+            return decode;
+        }
+
+        public static byte[] largeThumbnail(int id) {
+            string uuid = thumbServ.generateThumbnail(id, true, 672, true, 378, true, thumbnailFormat.PNG, true);
+            bool done = false;
+            int retries = 10;
+            while (!done && retries > 0) {
+                Thread.Sleep(200); // hack hack hack
+                bool dummy;
+                thumbServ.isDone(uuid, out done, out dummy);
+                retries--;
+            }
+            string data = thumbServ.getThumbnailAsBytes(uuid);
+
+            byte[] decode = Convert.FromBase64String(data);
             return decode;
         }
 
