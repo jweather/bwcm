@@ -36,9 +36,13 @@ namespace BWCMAPI {
                     Graphics g = Graphics.FromImage(image);
                     g.Clear(Color.LightGray);
 
+
+                    fitText(g, Color.Gray, "Calibri", q["placeholder"], new RectangleF(0, 0, W, H));
+                    /*
                     Font f = new Font("Calibri", 24);
                     SizeF size = g.MeasureString(q["placeholder"], f);
                     g.DrawString(q["placeholder"], f, new SolidBrush(Color.Gray), (W-size.Width)/2, (H-size.Height)/2);
+                     */
 
                     MemoryStream ms = new MemoryStream();
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
@@ -51,6 +55,24 @@ namespace BWCMAPI {
             Response.ContentType = "image/png";
             Response.Clear();
             Response.OutputStream.Write(thumbdata, 0, thumbdata.Length);
+        }
+        // fit text in box
+        public void fitText(Graphics g, Color c, string fontFamily, string text, RectangleF fit) {
+            SizeF textSize;
+            Font font;
+            float pt = 128;
+            while (true) {
+                font = new Font(fontFamily, pt);
+                textSize = g.MeasureString(text, font, (int)fit.Width);
+                if (textSize.Height < fit.Height)
+                    break;
+                pt = pt - pt / 10;
+                if (pt <= 8) break;
+            }
+
+            StringFormat format = new StringFormat(StringFormatFlags.NoClip);
+            format.LineAlignment = StringAlignment.Center;
+            g.DrawString(text, font, new SolidBrush(c), fit, format);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace BWCMAPI.data {
             types.Add("text", typeof(WidgetText));
             types.Add("none", typeof(WidgetNone));
             types.Add("image", typeof(WidgetImage));
+            types.Add("video", typeof(WidgetVideo));
             types.Add("twitter", typeof(WidgetTwitter));
             types.Add("weather", typeof(WidgetWeather));
             types.Add("templateinfo", typeof(TemplateInfo));

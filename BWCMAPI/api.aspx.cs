@@ -28,7 +28,8 @@ namespace BWCMAPI {
             if (Request.RequestType == "POST") {
                 postdata = new byte[Request.ContentLength];
                 Request.InputStream.Read(postdata, 0, Request.ContentLength);
-                body = Encoding.ASCII.GetString(postdata, 0, Request.ContentLength);
+                if (Request.PathInfo != "/upload")
+                    body = Encoding.ASCII.GetString(postdata, 0, Request.ContentLength);
             }
             try {
                 BUser user = (BUser)Session["user"], u;
@@ -95,6 +96,7 @@ namespace BWCMAPI {
                                 result = HttpStatusCode.Forbidden;
                             } else {
                                 string localPath = Global.cfg("uploadDir") + @"\" + fname;
+
                                 FileStream fs = File.Open(localPath, FileMode.Create);
                                 fs.Write(postdata, 0, Request.ContentLength);
                                 fs.Close();

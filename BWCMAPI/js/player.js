@@ -350,10 +350,16 @@ function previewWidget(fieldName) {
 	var preview = $('#preview-' + fieldName);
 	var src = '';
 	if (widget == 'image') {
-		if (uploadedDataFor[fieldName])
+		if (uploadedDataFor[fieldName]) {
 			src = uploadedDataFor[fieldName];
-		else {
+		} else {
 			// generate an appropriate placeholder image using the desired width/height of the image
+			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.w + 'x' + finfo.h;
+		}
+	} else if (widget == 'video') {
+		if (uploadedDataFor[fieldName]) {
+			src = '/thumbnail.aspx?id=&placeholder=' + uploadedDataFor[fieldName]; // file name
+		} else {
 			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.w + 'x' + finfo.h;
 		}
 	} else if (widget == 'none') {
@@ -385,48 +391,76 @@ $(document).on('input', '.twitterValue, .textValue', function() {
 	widgetPreview[fieldName] = setTimeout(function() { previewWidget(fieldName); }, 500);
 });
 
+function apiUpload(fieldName, file) {
+	var xhr = new XMLHttpRequest();
+	if (!editSlide.uploads) editSlide.uploads = {};
+	editSlide.uploads[fieldName] = xhr;
+	xhr.open('POST', '/api/upload', true);
+	xhr.setRequestHeader('X_FILENAME', file.name);
+	xhr.setRequestHeader('X_PLAYER', editPlayer.name);
+	xhr.onload = function(e) {
+		if (!editSlide) return;
+		if (xhr.status == 403) {
+			alert("Session has expired -- you are now logged out");
+			window.location.href = '/index.html';
+			return;
+		} else if (xhr.status != 200) {
+			alert("Server error, upload failed");
+		} else {
+			var r = JSON.parse(e.target.response);
+			console.log('uploaded new media item with ID ' + r.id + ' for field ' + fieldName);
+			editSlide.fieldByName[fieldName].mediaID = r.id;
+			delete editSlide.uploads[fieldName];
+			$('#uploading-' + fieldName).hide();
+		}
+	}
+	xhr.onerror = function(xhr) {
+		alert("Network error, upload failed");
+		delete editSlide.uploads[fieldName];
+	}
+	xhr.send(file);
+}
+
+
 $(document).on('change', '#slideEdit input[type=file]', function(e) {
 	editSlide.changed = true;
 	var files = e.target.files || e.dataTransfer.files;
 	var file = files[0];
 	var fieldName = $(e.target).data('name');
-	if (file.type.indexOf("image") == 0) {
-		$('#uploading-' + fieldName).show();
-	
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			var preview = $('#preview-' + fieldName);
-			uploadedDataFor[fieldName] = e.target.result;
-			previewWidget(fieldName);
-		}
-		reader.readAsDataURL(file);
-		var xhr = new XMLHttpRequest();
-		if (!editSlide.uploads) editSlide.uploads = {};
-		editSlide.uploads[fieldName] = xhr;
-		xhr.open('POST', '/api/upload', true);
-		xhr.setRequestHeader('X_FILENAME', file.name);
-		xhr.setRequestHeader('X_PLAYER', editPlayer.name);
-		xhr.onload = function(e) {
-			if (!editSlide) return;
-			if (xhr.status == 403) {
-				alert("Session has expired -- you are now logged out");
-				window.location.href = '/index.html';
-				return;
-			} else if (xhr.status != 200) {
-				alert("Server error, upload failed");
-			} else {
-				var r = JSON.parse(e.target.response);
-				console.log('uploaded new media item with ID ' + r.id + ' for field ' + fieldName);
-				editSlide.fieldByName[fieldName].mediaID = r.id;
-				delete editSlide.uploads[fieldName];
-				$('#uploading-' + fieldName).hide();
+	var type = $(e.target).data('type');
+	if (type == 'image') {
+		if (file.type.indexOf("image") != 0) {
+			alert('File does not appear to be an image: ' + file.type);
+			return;
+		} else {
+			$('#uploading-' + fieldName).show();
+			
+			// local preview
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				uploadedDataFor[fieldName] = e.target.result;
+				previewWidget(fieldName);
 			}
+			reader.readAsDataURL(file);
+			
+			apiUpload(fieldName, file);
 		}
-		xhr.onerror = function(xhr) {
-			alert("Network error, upload failed");
-			delete editSlide.uploads[fieldName];
-		}
-		xhr.send(file);
+	} else if (type == 'video') {
+		if (file.type.indexOf('video') != 0) {
+			alert('File does not appear to be a video: ' + file.type);
+			return;
+		} else if (file.size > 100*1024*1024) {
+			alert('File must be under 100MB (file size ' + Math.floor(file.size/1024/1024) + 'MB)');
+			return;
+		} else {
+			$('#uploading-' + fieldName).show();
+			
+			// no preview available?
+			uploadedDataFor[fieldName] = file.name;
+			previewWidget(fieldName);
+			
+			apiUpload(fieldName, file);
+		}		
 	}
 });
 
@@ -502,7 +536,7 @@ $('#slideSave').click(function() {
 		var fieldName = $(this).data('name');
 		var field = editSlide.fieldByName[fieldName];
 		
-		if (field.widget.__type == 'image') {
+		if (field.widget.__type == 'image' || field.widget.__type == 'video') {
 			if (field.mediaID) return;
 		} else if (field.widget.__type == 'text') {
 			if (field.widget.text) return;
@@ -621,6 +655,8 @@ var templateField = {tag: 'div', 'class': 'form-group', children: [
 			{tag: 'ul', 'class': 'nav nav-tabs', children: [
 				{tag: 'li', 'class': 'image', children: 
 					[{tag: 'a', href: '#${name}-image', 'data-toggle': 'tab', html: 'Image', 'data-widget': 'image'}]},
+				{tag: 'li', 'class': 'video', children: 
+					[{tag: 'a', href: '#${name}-video', 'data-toggle': 'tab', html: 'Video', 'data-widget': 'video'}]},
 				{tag: 'li', 'class': 'text', children: 
 					[{tag: 'a', href: '#${name}-text', 'data-toggle': 'tab', html: 'Text', 'data-widget': 'text'}]},
 				{tag: 'li', 'class': 'twitter', children: 
@@ -633,7 +669,11 @@ var templateField = {tag: 'div', 'class': 'form-group', children: [
 			{tag: 'div', 'class': 'tab-content', children: [
 				{tag: 'div', 'class': 'tab-pane', id: '${name}-image', children: [
 					{tag: 'p', html: 'Select an image file to upload:'},
-					{tag: 'input', type: 'file', id: 'upload-${name}', 'data-name': '${name}'}
+					{tag: 'input', type: 'file', id: 'upload-${name}', 'data-name': '${name}', 'data-type': 'image'}
+				]},
+				{tag: 'div', 'class': 'tab-pane', id: '${name}-video', children: [
+					{tag: 'p', html: 'Select a video file to upload (max 100MB):'},
+					{tag: 'input', type: 'file', id: 'upload-${name}', 'data-name': '${name}', 'data-type': 'video'}
 				]},
 				{tag: 'div', 'class': 'tab-pane', id: '${name}-text', children: [
 					{tag: 'p', html: 'Enter text to display:'},

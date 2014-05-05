@@ -268,7 +268,8 @@ namespace BWCMAPI {
                     fieldTO.id = tfield.templateFieldID; fieldTO.idSpecified = true; // use template field ID
                     fieldTO.name = field.name;
 
-                    if (field.widget != null && !(field.widget is WidgetImage))
+                    // this should live in the Widget class
+                    if (field.widget != null && !(field.widget is WidgetImage) && !(field.widget is WidgetVideo))
                         field.mediaID = field.widget.upload();
 
                     if (field.widget is WidgetTwitter && player.info.defaultTwitter == "") {

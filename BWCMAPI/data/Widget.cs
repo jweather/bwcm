@@ -295,4 +295,19 @@ namespace BWCMAPI.data {
         }
     }
 
+    public class WidgetVideo : Widget {
+        public WidgetVideo() { }
+
+        protected override void render(Graphics g) {
+            g.Clear(Color.White);
+            Global.error("Why are you rendering a WidgetVideo?");
+        }
+        protected override string key() {
+            return "";
+        }
+        public override bool needRefresh() {
+            return false;
+        }
+    }
+
 }
