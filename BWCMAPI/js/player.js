@@ -360,7 +360,7 @@ function previewWidget(fieldName) {
 		if (uploadedDataFor[fieldName]) {
 			src = '/thumbnail.aspx?id=&placeholder=' + uploadedDataFor[fieldName]; // file name
 		} else {
-			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=' + finfo.w + 'x' + finfo.h;
+			src = '/thumbnail.aspx?id=' + field.mediaID + '&placeholder=Upload+a+video';
 		}
 	} else if (widget == 'none') {
 		src = '';
