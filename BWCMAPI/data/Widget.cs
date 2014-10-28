@@ -9,6 +9,7 @@ using System.Web.Hosting;
 using System.Xml;
 using LinqToTwitter;
 using System.Drawing.Text;
+using System.Text.RegularExpressions;
 
 namespace BWCMAPI.data {
     public abstract class Widget {
@@ -51,11 +52,8 @@ namespace BWCMAPI.data {
 
         // render and upload
         public int refresh() {
-            string sanitized = key();
-            foreach (char c in Path.GetInvalidFileNameChars())
-                sanitized = sanitized.Replace(c, '_');
-            sanitized = sanitized.Replace('.', '_'); // Scala doesn't seem to like dots in the filename
-            sanitized = sanitized.Replace(';', '_'); // or semicolons
+            Regex rgx = new Regex("[^a-zA-Z0-9 ]");
+            string sanitized = rgx.Replace(key(), "_");
             if (sanitized.Length > 100) sanitized = sanitized.Substring(0, 100); // max length
             string fname = sanitized + ".png";
 
