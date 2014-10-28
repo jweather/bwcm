@@ -55,6 +55,7 @@ namespace BWCMAPI.data {
             foreach (char c in Path.GetInvalidFileNameChars())
                 sanitized = sanitized.Replace(c, '_');
             sanitized = sanitized.Replace('.', '_'); // Scala doesn't seem to like dots in the filename
+            sanitized = sanitized.Replace(';', '_'); // or semicolons
             if (sanitized.Length > 100) sanitized = sanitized.Substring(0, 100); // max length
             string fname = sanitized + ".png";
 
